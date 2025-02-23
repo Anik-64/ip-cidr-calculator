@@ -1,1 +1,1 @@
-# IP-to-CIDR-
+# CIDR to IP 
