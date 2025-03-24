@@ -1,0 +1,30 @@
+{
+  "name": "ip-cidr-calculator",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [
+    "ip",
+    "calculator"
+  ],
+  "homepage": "https://github.com/Anik-64/ip-cidr-calculator#readme",
+  "bugs": {
+    "url": "https://github.com/Anik-64/ip-cidr-calculator/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Anik-64/ip-cidr-calculator.git"
+  },
+  "license": "ISC",
+  "author": "Anik Majumder",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "ipaddr": "^0.1.0"
+  },
+  "devDependencies": {}
+}
