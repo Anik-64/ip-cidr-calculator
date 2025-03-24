@@ -166,11 +166,11 @@ app.post("/aws-subnets", (req, res) => {
     const [baseAddr, baseBits] = ipaddr.parseCIDR(cidr);
     const totalHosts = Math.pow(2, 32 - baseBits);
     const numSubnetsNum = parseInt(numSubnets, 10);
+
     if (totalHosts / numSubnetsNum < 8) {
-      // Minimum subnet size check (e.g., /29 has 8 IPs)
-      return res
-        .status(400)
-        .json({ error: "Too many subnets for the given CIDR range" });
+      return res.status(400).json({ 
+        error: "Too many subnets for the given CIDR range" 
+      });
     }
 
     const hostsPerSubnet = totalHosts / numSubnetsNum;
