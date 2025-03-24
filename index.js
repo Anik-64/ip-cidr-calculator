@@ -261,72 +261,132 @@ app.post("/check-overlap", (req, res) => {
   }
 });
 
-// Section 4: Route Summarization
 app.post("/summarize-routes", (req, res) => {
   const { cidrs } = req.body;
 
-  if (!Array.isArray(cidrs) || cidrs.length < 2) return res.status(400).json({ error: "At least two CIDRs are required" });
-  if (!cidrs.every(isValidCidr)) return res.status(400).json({ error: "All inputs must be valid CIDRs" });
+  // Input validation
+  if (!Array.isArray(cidrs) || cidrs.length < 2) {
+    return res.status(400).json({ error: "At least two CIDRs are required" });
+  }
+  if (!cidrs.every(isValidCidr)) {
+    return res.status(400).json({ error: "All inputs must be valid CIDRs" });
+  }
 
   try {
-    const ranges = cidrs.map(cidr => {
+    // Convert CIDRs to numeric ranges
+    const ranges = cidrs.map((cidr) => {
       const [addr, bits] = ipaddr.parseCIDR(cidr);
       const start = addr.toByteArray().reduce((acc, val) => acc * 256 + val, 0);
-      return { start, end: start + Math.pow(2, 32 - bits) - 1, bits };
+      return {
+        start,
+        end: start + Math.pow(2, 32 - bits) - 1,
+        bits,
+      };
     });
 
-    const minStart = Math.min(...ranges.map(r => r.start));
-    const maxEnd = Math.max(...ranges.map(r => r.end));
-    const totalHosts = maxEnd - minStart + 1;
-    const summaryBits = 32 - Math.ceil(Math.log2(totalHosts));
-    const summaryBase = ipaddr.fromByteArray([(minStart >> 24) & 255, (minStart >> 16) & 255, (minStart >> 8) & 255, minStart & 255]).toString();
+    // Sort ranges by start address
+    ranges.sort((a, b) => a.start - b.start);
 
-    // Check if summarization is valid (all ranges must align on summary boundary)
-    const summaryStart = minStart & (~0 << (32 - summaryBits));
-    if (!ranges.every(r => (r.start & (~0 << (32 - summaryBits))) === summaryStart)) {
-      return res.status(400).json({ error: "CIDRs cannot be summarized into a single range" });
+    // Check contiguity
+    for (let i = 1; i < ranges.length; i++) {
+      if (ranges[i].start !== ranges[i - 1].end + 1) {
+        return res.status(400).json({
+          error:
+            "CIDRs cannot be summarized into a single range (not contiguous)",
+        });
+      }
     }
 
-    const summaryCidr = `${summaryBase}/${summaryBits}`;
+    // Calculate summary CIDR
+    const minStart = ranges[0].start;
+    const maxEnd = ranges[ranges.length - 1].end;
+    const totalHosts = maxEnd - minStart + 1;
+    const summaryBits = 32 - Math.ceil(Math.log2(totalHosts));
+    const summaryBase = ipaddr
+      .fromByteArray([
+        (minStart >> 24) & 255,
+        (minStart >> 16) & 255,
+        (minStart >> 8) & 255,
+        minStart & 255,
+      ])
+      .toString();
+
     const netmask = calculateNetmask(summaryBits);
 
     res.json({
       originalCidrs: cidrs,
-      summarizedCidr: summaryCidr,
+      summarizedCidr: `${summaryBase}/${summaryBits}`,
       netmask: netmask,
-      totalHosts: Math.pow(2, 32 - summaryBits)
+      totalHosts: Math.pow(2, 32 - summaryBits),
     });
   } catch (error) {
     res.status(500).json({ error: "Server error summarizing routes" });
   }
 });
 
-// Section 5: VLAN Subnet Planner
 app.post("/vlan-subnets", (req, res) => {
   const { baseCidr, vlans } = req.body;
+  console.log(baseCidr + ' space ' + vlans);
 
-  if (!baseCidr) return res.status(400).json({ error: "Base CIDR is required" });
-  if (!isValidCidr(baseCidr)) return res.status(400).json({ error: "Invalid base CIDR format (e.g., 10.0.0.0/16)" });
-  if (!Array.isArray(vlans) || !vlans.length) return res.status(400).json({ error: "VLANs array is required" });
-  if (!vlans.every(v => v.name && typeof v.hosts === 'number' && v.hosts > 0)) {
-    return res.status(400).json({ error: "Each VLAN must have a name and a positive host count" });
+  // Validation (unchanged)
+  if (!baseCidr)
+    return res.status(400).json({ error: "Base CIDR is required" });
+  if (!isValidCidr(baseCidr)) {
+    return res
+      .status(400)
+      .json({ error: "Invalid base CIDR format (e.g., 10.0.0.0/16)" });
+  }
+  if (!Array.isArray(vlans) || !vlans.length) {
+    return res.status(400).json({ error: "VLANs array is required" });
+  }
+  if (
+    !vlans.every((v) => v.name && typeof v.hosts === "number" && v.hosts > 0)
+  ) {
+    return res
+      .status(400)
+      .json({ error: "Each VLAN must have a name and a positive host count" });
   }
 
   try {
     const [baseAddr, baseBits] = ipaddr.parseCIDR(baseCidr);
     const totalAvailable = Math.pow(2, 32 - baseBits);
-    let currentIpNum = baseAddr.toByteArray().reduce((acc, val) => acc * 256 + val, 0);
+    let currentIpNum = baseAddr
+      .toByteArray()
+      .reduce((acc, val) => acc * 256 + val, 0);
     let usedHosts = 0;
 
-    const subnets = vlans.map(vlan => {
-      const subnetSize = Math.pow(2, Math.ceil(Math.log2(vlan.hosts + 2))); // +2 for network/broadcast
-      const subnetBits = 32 - Math.log2(subnetSize);
-      if (usedHosts + subnetSize > totalAvailable) throw new Error("Not enough IPs for all VLANs");
+    const subnets = vlans.map((vlan) => {
+      // Calculate the smallest subnet that fits the requested hosts
+      const requiredHosts = vlan.hosts + 2; // Network + broadcast
+      const subnetBits = 32 - Math.ceil(Math.log2(requiredHosts));
+      const subnetSize = Math.pow(2, 32 - subnetBits);
 
-      const firstIp = ipaddr.fromByteArray([(currentIpNum >> 24) & 255, (currentIpNum >> 16) & 255, (currentIpNum >> 8) & 255, currentIpNum & 255]).toString();
-      const netmask = calculateNetmask(subnetBits);
+      // Verify we have enough space
+      if (usedHosts + subnetSize > totalAvailable) {
+        throw new Error("Not enough IP space in base CIDR for all VLANs");
+      }
+
+      // Calculate IP range
+      const firstIp = ipaddr
+        .fromByteArray([
+          (currentIpNum >> 24) & 255,
+          (currentIpNum >> 16) & 255,
+          (currentIpNum >> 8) & 255,
+          currentIpNum & 255,
+        ])
+        .toString();
+
       const lastIpNum = currentIpNum + subnetSize - 1;
-      const lastIp = ipaddr.fromByteArray([(lastIpNum >> 24) & 255, (lastIpNum >> 16) & 255, (lastIpNum >> 8) & 255, lastIpNum & 255]).toString();
+      const lastIp = ipaddr
+        .fromByteArray([
+          (lastIpNum >> 24) & 255,
+          (lastIpNum >> 16) & 255,
+          (lastIpNum >> 8) & 255,
+          lastIpNum & 255,
+        ])
+        .toString();
+
+      const netmask = calculateNetmask(subnetBits);
 
       const subnet = {
         vlanName: vlan.name,
@@ -335,17 +395,21 @@ app.post("/vlan-subnets", (req, res) => {
         firstIp: firstIp,
         lastIp: lastIp,
         totalHosts: subnetSize,
-        usableHosts: subnetSize - 2, // Network and broadcast reserved
+        usableHosts: subnetSize - 2,
       };
 
+      // Update counters
       currentIpNum += subnetSize;
       usedHosts += subnetSize;
+
       return subnet;
     });
 
     res.json(subnets);
   } catch (error) {
-    res.status(500).json({ error: error.message || "Server error planning VLAN subnets" });
+    res
+      .status(500)
+      .json({ error: error.message || "Server error planning VLAN subnets" });
   }
 });
 
