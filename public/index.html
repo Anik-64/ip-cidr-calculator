@@ -3,33 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IP/CIDR Calculator</title>
+  <meta name="description" content="Free IP/CIDR Calculator to convert CIDR to IP ranges, calculate AWS subnets, check overlaps, and summarize routes for network engineers.">
+  <meta name="keywords" content="IP calculator, CIDR calculator, AWS subnet calculator, subnet overlap checker, route summarization, network tool">
+  <meta name="author" content="Anik Majumder">
+  <meta name="robots" content="index, follow">
+
+  <meta property="og:title" content="IP/CIDR Calculator">
+  <meta property="og:description" content="A powerful tool for network engineers to manage IP ranges, CIDR conversions, AWS subnets, and more.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://yourdomain.com">
+  <meta property="og:image" content="https://firebasestorage.googleapis.com/v0/b/alleventsair.appspot.com/o/files%2Fimages%2FBvxTY_1742838672008.png?alt=media&token=ee0e12c4-e3a3-4b4f-87b6-c31428fe0d92">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="IP/CIDR Calculator">
+  <meta name="twitter:description" content="Calculate IP ranges, CIDR, AWS subnets, and more with this free tool.">
+  <meta name="twitter:image" content="https://firebasestorage.googleapis.com/v0/b/alleventsair.appspot.com/o/files%2Fimages%2FBvxTY_1742838672008.png?alt=media&token=ee0e12c4-e3a3-4b4f-87b6-c31428fe0d92">
+  <link rel="canonical" href="https://yourdomain.com">
+
+  <title>IP/CIDR Calculator - Network Engineering Tool</title>
+  <link rel="icon" type="image/png" href="./logo/ip-address.png" alt="IP/CIDR Calculator Logo">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 p-4 sm:p-6">
   <div class="max-w-5xl mx-auto">
     <h1 class="text-2xl sm:text-3xl font-bold text-center mb-6">IP/CIDR Calculator</h1>
+    <p class="text-center text-gray-600 mb-6">
+      A tool for network engineers to calculate IP ranges, convert formats, manage AWS subnets, check overlaps, and summarize routes.
+    </p>
 
+    <!-- CIDR to IP Range -->
     <div class="bg-white p-4 rounded-lg shadow mb-6">
       <h2 class="text-lg sm:text-xl font-semibold mb-4">CIDR to IP Range</h2>
       <div class="flex flex-col sm:flex-row gap-2">
-        <input id="cidrInput" type="text" placeholder="e.g., 192.168.1.0/24" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <button onclick="calculateCidrToIp()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 sm:w">
-          Calculate
-        </button>
+        <div class="relative w-full">
+          <input id="cidrInput" type="text" placeholder="e.g., 192.168.1.0/24" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" oninput="validateCidrInput()">
+          <span class="text-xs text-gray-500 mt-1 block">Enter a CIDR (e.g., 192.168.1.0/24).</span>
+          <span id="cidrInputError" class="text-xs text-red-500 mt-1 hidden"></span>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="calculateCidrToIp()" class="bg-blue-500 text-white h-9 px-4 rounded hover:bg-blue-600 sm:w-auto">Calculate</button>
+          <button onclick="clearCidrSection()" class="bg-gray-300 text-gray-700 h-9 px-4 rounded hover:bg-gray-400 sm:w-auto">Clear</button>
+        </div>
+      </div>
+      <div class="text-sm text-gray-500 mt-2">
+        Try: <button class="text-blue-500 underline" onclick="document.getElementById('cidrInput').value='192.168.1.0/24'; validateCidrInput(); calculateCidrToIp();">192.168.1.0/24</button>
       </div>
       <div class="overflow-x-auto mt-4">
         <table id="cidrResult" class="w-full min-w-[640px] hidden border-collapse">
           <thead>
             <tr class="bg-gray-200 text-sm sm:text-base">
-              <th class="p-2 text-left">CIDR Range</th>
-              <th class="p-2 text-left">Netmask</th>
-              <th class="p-2 text-left">Wildcard Bits</th>
-              <th class="p-2 text-left">First IP</th>
-              <th class="p-2 text-left">First IP (Dec)</th>
-              <th class="p-2 text-left">Last IP</th>
-              <th class="p-2 text-left">Last IP (Dec)</th>
-              <th class="p-2 text-left">Total Hosts</th>
+              <th class="p-2 text-left tooltip" title="The input CIDR range">CIDR Range</th>
+              <th class="p-2 text-left tooltip" title="Subnet mask">Netmask</th>
+              <th class="p-2 text-left tooltip" title="Inverse of the netmask">Wildcard Bits</th>
+              <th class="p-2 text-left tooltip" title="First IP in the range">First IP</th>
+              <th class="p-2 text-left tooltip" title="First IP in decimal">First IP (Dec)</th>
+              <th class="p-2 text-left tooltip" title="Last IP in the range">Last IP</th>
+              <th class="p-2 text-left tooltip" title="Last IP in decimal">Last IP (Dec)</th>
+              <th class="p-2 text-left tooltip" title="Total IPs in the range">Total Hosts</th>
             </tr>
           </thead>
           <tbody class="text-sm sm:text-base"></tbody>
@@ -37,23 +67,29 @@
       </div>
     </div>
 
+    <!-- IP to CIDR -->
     <div class="bg-white p-4 rounded-lg shadow mb-6">
       <h2 class="text-lg sm:text-xl font-semibold mb-4">IP to CIDR</h2>
       <div class="flex flex-col gap-2">
-        <input id="firstIpInput" type="text" placeholder="First IP (e.g., 192.168.1.0)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blu">
-        <input id="lastIpInput" type="text" placeholder="Last IP (e.g., 192.168.1.255)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blu">
-        <button onclick="calculateIpToCidr()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 w-full sm:w">
-          Convert
-        </button>
+        <input id="firstIpInput" type="text" placeholder="First IP (e.g., 192.168.1.0)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" oninput="validateIpToCidrInputs()">
+        <input id="lastIpInput" type="text" placeholder="Last IP (e.g., 192.168.1.255)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" oninput="validateIpToCidrInputs()">
+        <div id="ipToCidrError" class="text-xs text-red-500 mt-1 hidden"></div>
+        <div class="flex gap-2">
+          <button onclick="calculateIpToCidr()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 w-full sm:w-auto">Convert</button>
+          <button onclick="clearIpToCidrSection()" class="bg-gray-300 text-gray-700 p-2 rounded hover:bg-gray-400 w-full sm:w-auto">Clear</button>
+        </div>
+      </div>
+      <div class="text-sm text-gray-500 mt-2">
+        Try: <button class="text-blue-500 underline" onclick="document.getElementById('firstIpInput').value='192.168.1.0'; document.getElementById('lastIpInput').value='192.168.1.255'; validateIpToCidrInputs(); calculateIpToCidr();">192.168.1.0 - 192.168.1.255</button>
       </div>
       <div class="overflow-x-auto mt-4">
         <table id="ipToCidrResult" class="w-full min-w-[480px] hidden border-collapse">
           <thead>
             <tr class="bg-gray-200 text-sm sm:text-base">
-              <th class="p-2 text-left">IP Range</th>
-              <th class="p-2 text-left">CIDR Notation</th>
-              <th class="p-2 text-left">Netmask</th>
-              <th class="p-2 text-left">Total Hosts</th>
+              <th class="p-2 text-left tooltip">IP Range<span class="tooltip-text">Input range</span></th>
+              <th class="p-2 text-left tooltip">CIDR Notation<span class="tooltip-text">Converted CIDR</span></th>
+              <th class="p-2 text-left tooltip">Netmask<span class="tooltip-text">Subnet mask</span></th>
+              <th class="p-2 text-left tooltip">Total Hosts<span class="tooltip-text">Total IPs</span></th>
             </tr>
           </thead>
           <tbody class="text-sm sm:text-base"></tbody>
@@ -61,46 +97,60 @@
       </div>
     </div>
 
+    <!-- AWS Subnet Calculator -->
     <div class="bg-white p-4 rounded-lg shadow mb-6">
       <h2 class="text-lg sm:text-xl font-semibold mb-4">AWS Subnet Calculator</h2>
       <div class="flex flex-col gap-2">
-        <input id="awsCidrInput" type="text" placeholder="e.g., 10.0.0.0/16" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <input id="numSubnetsInput" type="number" placeholder="Number of Subnets (e.g., 4)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"min="1">
-        <button onclick="calculateAwsSubnets()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 w-full sm:w-auto">
-          Generate Subnets
-        </button>
+        <input id="awsCidrInput" type="text" placeholder="e.g., 10.0.0.0/16" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" oninput="validateAwsInputs()">
+        <input id="numSubnetsInput" type="number" placeholder="Number of Subnets (e.g., 4)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" min="1" oninput="validateAwsInputs()">
+        <div id="awsError" class="text-xs text-red-500 mt-1 hidden"></div>
+        <div class="flex gap-2">
+          <button onclick="calculateAwsSubnets()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 w-full sm:w-auto">Generate Subnets</button>
+          <button onclick="clearAwsSection()" class="bg-gray-300 text-gray-700 p-2 rounded hover:bg-gray-400 w-full sm:w-auto">Clear</button>
+        </div>
+        <div class="text-xs text-gray-500 mt-2">
+          Note: AWS reserves 5 IPs per subnet (network, broadcast, and 3 for services). 
+          Try: <button class="text-blue-500 underline" onclick="document.getElementById('awsCidrInput').value='10.0.0.0/16'; document.getElementById('numSubnetsInput').value='4'; validateAwsInputs(); calculateAwsSubnets();">10.0.0.0/16, 4 subnets</button>
+        </div>
       </div>
       <div id="awsSubnetsResult" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
     </div>
 
+    <!-- Subnet Overlap Checker -->
     <div class="bg-white p-4 rounded-lg shadow mb-6">
       <h2 class="text-lg sm:text-xl font-semibold mb-4">Subnet Overlap Checker</h2>
-      <textarea 
-        id="overlapInput" 
-        placeholder="Enter CIDRs, one per line (e.g., 192.168.1.0/24)" 
-        class="w-full p-2 border rounded mb-2 h-24"
-      ></textarea>
-      <button 
-        onclick="checkOverlap()" 
-        class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 w-full sm:w-auto"
-      >
-        Check Overlap
-      </button>
+      <textarea id="overlapInput" placeholder="Enter CIDRs, one per line (e.g., 192.168.1.0/24)" class="w-full p-2 border rounded mb-2 h-24" oninput="validateOverlapInput()"></textarea>
+      <div id="overlapError" class="text-xs text-red-500 mt-1 hidden"></div>
+      <div class="flex gap-2">
+        <button onclick="checkOverlap()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 w-full sm:w-auto">Check Overlap</button>
+        <button onclick="clearOverlapSection()" class="bg-gray-300 text-gray-700 p-2 rounded hover:bg-gray-400 w-full sm:w-auto">Clear</button>
+      </div>
+      <div class="text-sm text-gray-500 mt-2">
+        Try: <button class="text-blue-500 underline" onclick="document.getElementById('overlapInput').value='192.168.1.0/24\n192.168.1.128/25'; validateOverlapInput(); checkOverlap();">192.168.1.0/24, 192.168.1.128/25</button>
+      </div>
       <div id="overlapResult" class="mt-4 text-sm"></div>
     </div>
 
+    <!-- Route Summarization -->
     <div class="bg-white p-4 rounded-lg shadow mb-6">
       <h2 class="text-lg sm:text-xl font-semibold mb-4">Route Summarization</h2>
-      <textarea id="routeInput" placeholder="Enter CIDRs, one per line (e.g., 192.168.0.0/24)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 h-24"></textarea>
-      <button onclick="summarizeRoutes()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 w-full sm:w-auto mt-2">Summarize</button>
+      <textarea id="routeInput" placeholder="Enter CIDRs, one per line (e.g., 192.168.0.0/24)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 h-24" oninput="validateRouteInput()"></textarea>
+      <div id="routeInputError" class="text-xs text-red-500 mt-1 hidden"></div>
+      <div class="flex gap-2">
+        <button onclick="summarizeRoutes()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 w-full sm:w-auto mt-2">Summarize</button>
+        <button onclick="clearRouteSection()" class="bg-gray-300 text-gray-700 p-2 rounded hover:bg-gray-400 w-full sm:w-auto mt-2">Clear</button>
+      </div>
+      <div class="text-sm text-gray-500 mt-2">
+        Try: <button class="text-blue-500 underline" onclick="document.getElementById('routeInput').value='192.168.0.0/24\n192.168.1.0/24'; validateRouteInput(); summarizeRoutes();">192.168.0.0/24, 192.168.1.0/24</button>
+      </div>
       <div id="routeResult" class="mt-4 overflow-x-auto">
         <table class="w-full min-w-[480px] hidden border-collapse" id="routeTable">
           <thead>
             <tr class="bg-gray-200 text-sm sm:text-base">
-              <th class="p-2 text-left">Original CIDRs</th>
-              <th class="p-2 text-left">Summarized CIDR</th>
-              <th class="p-2 text-left">Netmask</th>
-              <th class="p-2 text-left">Total Hosts</th>
+              <th class="p-2 text-left tooltip">Original CIDRs<span class="tooltip-text">Input CIDRs</span></th>
+              <th class="p-2 text-left tooltip">Summarized CIDR<span class="tooltip-text">Combined range</span></th>
+              <th class="p-2 text-left tooltip">Netmask<span class="tooltip-text">Subnet mask</span></th>
+              <th class="p-2 text-left tooltip">Total Hosts<span class="tooltip-text">Total IPs</span></th>
             </tr>
           </thead>
           <tbody class="text-sm sm:text-base"></tbody>
@@ -109,6 +159,9 @@
       </div>
     </div>
   </div>
+  <footer class="text-center text-gray-500 text-sm mt-6">
+    <p>IP/CIDR Calculator v1.0 | Built by Anik Majumder | © 2025</p>
+  </footer>
   <script src="script.js"></script>
 </body>
 </html>
