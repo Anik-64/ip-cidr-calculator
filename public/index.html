@@ -10,7 +10,6 @@
   <div class="max-w-5xl mx-auto">
     <h1 class="text-2xl sm:text-3xl font-bold text-center mb-6">IP/CIDR Calculator</h1>
 
-    <!-- Section 1: CIDR to IP Range -->
     <div class="bg-white p-4 rounded-lg shadow mb-6">
       <h2 class="text-lg sm:text-xl font-semibold mb-4">CIDR to IP Range</h2>
       <div class="flex flex-col sm:flex-row gap-2">
@@ -38,7 +37,6 @@
       </div>
     </div>
 
-    <!-- Section 2: IP to CIDR -->
     <div class="bg-white p-4 rounded-lg shadow mb-6">
       <h2 class="text-lg sm:text-xl font-semibold mb-4">IP to CIDR</h2>
       <div class="flex flex-col gap-2">
@@ -63,7 +61,6 @@
       </div>
     </div>
 
-    <!-- Section 3: AWS Subnet Calculator -->
     <div class="bg-white p-4 rounded-lg shadow mb-6">
       <h2 class="text-lg sm:text-xl font-semibold mb-4">AWS Subnet Calculator</h2>
       <div class="flex flex-col gap-2">
@@ -76,7 +73,6 @@
       <div id="awsSubnetsResult" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
     </div>
 
-    <!-- Subnet overlap checker -->
     <div class="bg-white p-4 rounded-lg shadow mb-6">
       <h2 class="text-lg sm:text-xl font-semibold mb-4">Subnet Overlap Checker</h2>
       <textarea 
@@ -93,7 +89,6 @@
       <div id="overlapResult" class="mt-4 text-sm"></div>
     </div>
 
-    <!-- Section 4: Route Summarization -->
     <div class="bg-white p-4 rounded-lg shadow mb-6">
       <h2 class="text-lg sm:text-xl font-semibold mb-4">Route Summarization</h2>
       <textarea id="routeInput" placeholder="Enter CIDRs, one per line (e.g., 192.168.0.0/24)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 h-24"></textarea>
@@ -113,16 +108,6 @@
         <div id="routeError" class="text-red-500 text-sm"></div>
       </div>
     </div>
-
-    <!-- Section 5: VLAN Subnet Planner -->
-    <div class="bg-white p-4 rounded-lg shadow mb-6">
-      <h2 class="text-lg sm:text-xl font-semibold mb-4">VLAN Subnet Planner</h2>
-      <input id="vlanBaseCidr" type="text" placeholder="Base CIDR (e.g., 10.0.0.0/16)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2">
-      <textarea id="vlanInput" placeholder="Enter VLANs as 'name:hosts', one per line (e.g., VLAN10:50)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 h-24"></textarea>
-      <button onclick="planVlanSubnets()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 w-full sm:w-auto mt-2">Plan Subnets</button>
-      <div id="vlanResult" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-    </div>
-
   </div>
   <script src="script.js"></script>
 </body>
