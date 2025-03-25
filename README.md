@@ -39,6 +39,31 @@ A web-based tool designed for network engineers to perform IP and CIDR-related c
      - Input: `192.168.0.0/24`, `192.168.1.0/24`
      - Output: `192.168.0.0/23`
 
+## Docker Usage
+
+If you prefer to run the application using Docker, follow these steps:
+
+1. **Pull the Docker Image**:
+   ```bash
+   docker pull beekeeper27/ip-cidr-calculator:v1.0
+   ```
+
+2. **Run the Container**:
+   ```bash
+   docker run -it -d -p 3001:2723 --name=ipcidrcalculator beekeeper27/ip-cidr-calculator:v1.0
+   ```
+   The application will be accessible at `http://localhost:3001`.
+
+3. **Check Running Containers**:
+   ```bash
+   docker ps
+   ```
+
+4. **Stop the Container**:
+   ```bash
+   docker stop <container-id>
+   ```
+
 ## Contributing
 
 1. Fork the repository.
