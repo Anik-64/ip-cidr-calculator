@@ -207,11 +207,12 @@ async function calculateCidrToIp() {
   clearError("cidrInput");
 
   try {
-    const response = await fetch("/cidr-to-ip", {
+    const response = await fetch("/api/v1/cidr-to-ip", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ cidr }),
     });
+
     if (!response.ok) throw new Error("Server error");
     const data = await response.json();
 
@@ -223,9 +224,9 @@ async function calculateCidrToIp() {
         <td class="p-2">${data.cidrRange}</td>
         <td class="p-2">${data.netmask}</td>
         <td class="p-2">${data.wildcardBits}</td>
-        <td class="p-2">${data.firstIp}</td>
+        <td class="p-2 border-2 border-blue-200">${data.firstIp}</td>
         <td class="p-2">${data.firstIpDecimal}</td>
-        <td class="p-2">${data.lastIp}</td>
+        <td class="p-2 border-2 border-blue-200">${data.lastIp}</td>
         <td class="p-2">${data.lastIpDecimal}</td>
         <td class="p-2">${data.totalHosts}</td>
       </tr>
@@ -272,11 +273,12 @@ async function calculateIpToCidr() {
   clearError("lastIpInput");
 
   try {
-    const response = await fetch("/ip-to-cidr", {
+    const response = await fetch("/api/v1/ip-to-cidr", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ firstIp, lastIp }),
     });
+
     if (!response.ok) throw new Error("Server error");
     const data = await response.json();
 
@@ -331,11 +333,12 @@ async function calculateAwsSubnets() {
   clearError("numSubnetsInput");
 
   try {
-    const response = await fetch("/aws-subnets", {
+    const response = await fetch("/api/v1/aws-subnets", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ cidr, numSubnets }),
     });
+
     if (!response.ok) throw new Error("Server error");
     const subnets = await response.json();
 
@@ -355,13 +358,13 @@ async function calculateAwsSubnets() {
             <tr><td class="p-2 font-bold">Wildcard Bits</td><td class="p-2">${
               subnet.wildcardBits
             }</td></tr>
-            <tr><td class="p-2 font-bold">First IP</td><td class="p-2">${
+            <tr class="border-2 border-blue-200"><td class="p-2 font-bold">First IP</td><td class="p-2">${
               subnet.firstIp
             }</td></tr>
             <tr><td class="p-2 font-bold">First IP (Dec)</td><td class="p-2">${
               subnet.firstIpDecimal
             }</td></tr>
-            <tr><td class="p-2 font-bold">Last IP</td><td class="p-2">${
+            <tr class="border-2 border-blue-200"><td class="p-2 font-bold">Last IP</td><td class="p-2">${
               subnet.lastIp
             }</td></tr>
             <tr><td class="p-2 font-bold">Last IP (Dec)</td><td class="p-2">${
@@ -403,11 +406,12 @@ async function checkOverlap() {
   clearError("overlapInput");
 
   try {
-    const response = await fetch("/check-overlap", {
+    const response = await fetch("/api/v1/check-overlap", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ cidrs }),
     });
+
     if (!response.ok) throw new Error("Server error");
     const data = await response.json();
 
@@ -445,11 +449,12 @@ async function summarizeRoutes() {
   clearError("routeInput");
 
   try {
-    const response = await fetch("/summarize-routes", {
+    const response = await fetch("/api/v1/summarize-routes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ cidrs }),
     });
+
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "Server error");
 
