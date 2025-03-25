@@ -53,6 +53,14 @@ app.use(
   })
 );
 
+app.get("/healthcheck", (req, res) => {
+  try {
+    res.status(200).end();
+  } catch (err) {
+    res.status(503).end();
+  }
+});
+
 app.use("/api/v1", ipCIDRCalculator);
 
 app.listen(process.env.PORT, () => {
