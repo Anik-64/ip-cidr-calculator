@@ -45,7 +45,7 @@ If you prefer to run the application using Docker, follow these steps:
 
 1. **Pull the Docker Image**:
    ```bash
-   docker pull beekeeper27/ip-cidr-calculator:v1.0
+   docker pull beekeeper27/ip-cidr-calculator:v1.2
    ```
 
 2. **Run the Container**:
