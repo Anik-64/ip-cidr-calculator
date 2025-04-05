@@ -114,7 +114,11 @@
           <input id="numSubnetsInput" type="number" placeholder="Number of Subnets" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" min="1" oninput="validateAwsInputs()">
         </div>
         <div id="customSubnetInputs" class="flex flex-col gap-2 hidden">
-          <input type="number" class="subnet-hosts w-full p-2 border rounded" placeholder="Hosts for Subnet 1 (e.g., 500)" min="1"> 
+          <div class="flex gap-2 items-center">
+            <input type="number" class="subnet-hosts w-1/2 p-2 border rounded" placeholder="Hosts for Subnet 1 (e.g., 500)" min="1" oninput="validateAwsInputs()">
+            <input type="text" class="subnet-name w-1/2 p-2 border rounded" placeholder="Name (optional)">
+            <button class="text-red-500 text-sm font-bold w-6 h-6 flex items-center justify-center border border-red-500 rounded hover:bg-red-100">X</button>
+          </div>
           <button id="addSubnet" class="text-blue-500 text-sm underline text-left">+ Add Another Subnet</button>
         </div>
         <div id="awsError" class="text-xs text-red-500 mt-1 hidden" role="alert"></div>
