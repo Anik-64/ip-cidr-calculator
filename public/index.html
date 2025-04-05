@@ -97,23 +97,37 @@
     </div>
 
     <!-- AWS Subnet Calculator -->
-    <div class="bg-white p-4 rounded-lg shadow mb-6">
-      <h2 class="text-lg sm:text-xl font-semibold mb-4">AWS Subnet Calculator</h2>
+    <section class="bg-white p-4 rounded-lg shadow mb-6" aria-labelledby="aws-subnet-heading">
+      <h2 id="aws-subnet-heading" class="text-lg sm:text-xl font-semibold mb-4">AWS Subnet Calculator</h2>
+      <p class="text-sm text-gray-600 mb-4">Generate AWS subnets from a CIDR block, either equally divided or with custom host counts.</p>
       <div class="flex flex-col gap-2">
         <input id="awsCidrInput" type="text" placeholder="10.0.0.0/16" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" oninput="validateAwsInputs()">
-        <input id="numSubnetsInput" type="number" placeholder="Number of Subnets (4)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" min="1" oninput="validateAwsInputs()">
-        <div id="awsError" class="text-xs text-red-500 mt-1 hidden"></div>
+        <div class="flex gap-4 mb-2">
+          <label class="flex items-center">
+            <input type="radio" name="subnetMode" value="equal" checked class="mr-2" onchange="toggleSubnetMode()"> Equal Subnets
+          </label>
+          <label class="flex items-center">
+            <input type="radio" name="subnetMode" value="custom" class="mr-2" onchange="toggleSubnetMode()"> Custom Hosts
+          </label>
+        </div>
+        <div id="equalSubnetInput" class="flex flex-col gap-2">
+          <input id="numSubnetsInput" type="number" placeholder="Number of Subnets" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" min="1" oninput="validateAwsInputs()">
+        </div>
+        <div id="customSubnetInputs" class="flex flex-col gap-2 hidden">
+          <input type="number" class="subnet-hosts w-full p-2 border rounded" placeholder="Hosts for Subnet 1 (e.g., 500)" min="1"> 
+          <button id="addSubnet" class="text-blue-500 text-sm underline text-left">+ Add Another Subnet</button>
+        </div>
+        <div id="awsError" class="text-xs text-red-500 mt-1 hidden" role="alert"></div>
         <div class="flex gap-2">
-          <button onclick="calculateAwsSubnets()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 w-full sm:w-auto">Generate Subnets</button>
-          <button onclick="clearAwsSection()" class="bg-gray-300 text-gray-700 p-2 rounded hover:bg-gray-400 w-full sm:w-auto">Clear</button>
+          <button onclick="calculateAwsSubnets()" class="bg-blue-500 text-white h-9 px-4 rounded hover:bg-blue-600 w-full sm:w-auto">Generate Subnets</button>
+          <button onclick="clearAwsSection()" class="bg-gray-300 text-gray-700 h-9 px-4 rounded hover:bg-gray-400 w-full sm:w-auto">Clear</button>
         </div>
         <div class="text-xs text-gray-500 mt-2">
-          Note: AWS reserves 5 IPs per subnet (network, broadcast, and 3 for services). 
-          Try: <button class="text-blue-500 underline" onclick="document.getElementById('awsCidrInput').value='10.0.0.0/16'; document.getElementById('numSubnetsInput').value='4'; validateAwsInputs(); calculateAwsSubnets();">10.0.0.0/16, 4 subnets</button>
+          Note: AWS reserves 5 IPs per subnet (network, broadcast, and 3 for services).
         </div>
       </div>
       <div id="awsSubnetsResult" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-    </div>
+    </section>
 
     <!-- Subnet Overlap Checker -->
     <div class="bg-white p-4 rounded-lg shadow mb-6">
