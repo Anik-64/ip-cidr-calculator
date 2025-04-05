@@ -354,11 +354,25 @@ ipCIDRCalculator.post('/aws-subnets-custom',
                     throw new Error('All host counts must be positive integers');
                 }
                 return true;
+            }),
+        body('names')
+            .optional()
+            .isArray().withMessage('Names must be an array')
+            .customSanitizer(names => {
+                if (!Array.isArray(names)) return [];
+                    return names.map(name => 
+                        xss(
+                            name.trim(),    
+                            { 
+                                whiteList: {}, 
+                                stripIgnoreTag: true, 
+                                stripIgnoreTagBody: ['script'] 
+                            }
+                        ));
             })
     ], 
     async (req, res) => {
-        const { cidr, hosts } = req.body;
-        console.log(cidr + '           ' + hosts);
+        const { cidr, hosts, names = [] } = req.body;
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -409,6 +423,7 @@ ipCIDRCalculator.post('/aws-subnets-custom',
                     ]).toString();
 
                 const subnet = {
+                    name: names[index] || `Subnet ${index + 1}`,
                     cidrRange: `${firstIp}/${subnetBits}`,
                     netmask: netmask,
                     wildcardBits: getWildcardBits(netmask),
