@@ -8,7 +8,7 @@ function validateCidrInput() {
     error.classList.remove("hidden");
   } else if (!isValidCidr(input.value.trim())) {
     input.classList.add("error-border");
-    error.textContent = "Invalid CIDR format (e.g., 192.168.1.0/24).";
+    error.textContent = "Invalid CIDR format (192.168.1.0/24).";
     error.classList.remove("hidden");
   } else {
     input.classList.remove("error-border");
@@ -25,9 +25,9 @@ function validateIpToCidrInputs() {
   if (!firstIp.value.trim() || !lastIp.value.trim()) {
     message = "Please enter both IPs.";
   } else if (!isValidIp(firstIp.value.trim())) {
-    message = "Invalid First IP format (e.g., 192.168.1.0).";
+    message = "Invalid First IP format (192.168.1.0).";
   } else if (!isValidIp(lastIp.value.trim())) {
-    message = "Invalid Last IP format (e.g., 192.168.1.255).";
+    message = "Invalid Last IP format (192.168.1.255).";
   }
 
   if (message) {
@@ -51,7 +51,7 @@ function validateAwsInputs() {
   if (!cidr.value.trim()) {
     message = "Please enter a CIDR.";
   } else if (!isValidCidr(cidr.value.trim())) {
-    message = "Invalid CIDR format (e.g., 10.0.0.0/16).";
+    message = "Invalid CIDR format (10.0.0.0/16).";
   } else if (!numSubnets.value || numSubnets.value <= 0) {
     message = "Enter a positive number of subnets.";
   }
@@ -83,7 +83,7 @@ function validateOverlapInput() {
   } else if (!cidrs.every(isValidCidr)) {
     input.classList.add("error-border");
     error.textContent =
-      "All entries must be valid CIDRs (e.g., 192.168.1.0/24).";
+      "All entries must be valid CIDRs (192.168.1.0/24).";
     error.classList.remove("hidden");
   } else {
     input.classList.remove("error-border");
@@ -106,7 +106,7 @@ function validateRouteInput() {
   } else if (!cidrs.every(isValidCidr)) {
     input.classList.add("error-border");
     error.textContent =
-      "All entries must be valid CIDRs (e.g., 192.168.0.0/24).";
+      "All entries must be valid CIDRs (192.168.0.0/24).";
     error.classList.remove("hidden");
   } else {
     input.classList.remove("error-border");
@@ -165,46 +165,49 @@ function isValidCidr(cidr) {
 function ipToDecimal(ip) {
   return ip
     .split(".")
-    .reduce(
-      (acc, octet, index) => acc + parseInt(octet) * Math.pow(256, 3 - index),
-      0
-    );
+    .reduce((acc, octet, index) => acc + parseInt(octet) * Math.pow(256, 3 - index), 0);
 }
 
 // Helper function to show error message
 function showError(elementId, message) {
-  const input = document.getElementById(elementId);
-  let errorDiv = input.nextElementSibling;
-  if (!errorDiv || !errorDiv.classList.contains("error-message")) {
-    errorDiv = document.createElement("div");
-    errorDiv.classList.add("error-message", "text-red-500", "text-sm", "mt-1");
-    input.parentNode.insertBefore(errorDiv, input.nextSibling);
+  const errorSpan = document.getElementById(elementId);
+
+  if (errorSpan) {
+    errorSpan.textContent = message;
+    errorSpan.classList.remove("hidden");
   }
-  errorDiv.textContent = message;
 }
 
 // Helper function to clear error message
 function clearError(elementId) {
-  const input = document.getElementById(elementId);
-  const errorDiv = input.nextElementSibling;
-  if (errorDiv && errorDiv.classList.contains("error-message")) {
-    errorDiv.textContent = "";
+  const errorSpan = document.getElementById(elementId);
+
+  if (errorSpan) {
+    errorSpan.textContent = "";
+    errorSpan.classList.add("hidden");
   }
 }
+
+document.getElementById("cidrInput").addEventListener("input", () => {
+  clearError("cidrInputError");
+});
 
 async function calculateCidrToIp() {
   const cidr = document.getElementById("cidrInput").value.trim();
 
-  // Validation
   if (!cidr) {
-    showError("cidrInput", "Please enter a CIDR range.");
+    showError("cidrInputError", "Please enter a CIDR range.");
+    document.getElementById("cidrResult").classList.add("hidden");
     return;
   }
+
   if (!isValidCidr(cidr)) {
-    showError("cidrInput", "Invalid CIDR format (e.g., 192.168.1.0/24).");
+    showError("cidrInputError", "Invalid CIDR format (192.168.1.0/24).");
+    document.getElementById("cidrResult").classList.add("hidden");
     return;
   }
-  clearError("cidrInput");
+
+  clearError("cidrInputError");
 
   try {
     const response = await fetch("/api/v1/cidr-to-ip", {
@@ -213,64 +216,74 @@ async function calculateCidrToIp() {
       body: JSON.stringify({ cidr }),
     });
 
-    if (!response.ok) throw new Error("Server error");
     const data = await response.json();
+
+    if (data.error) {
+      showError("cidrInputError", data.message);
+      document.getElementById("cidrResult").classList.add("hidden");
+      return;
+    }
+
+    const result = data.result;
 
     const table = document.getElementById("cidrResult");
     table.classList.remove("hidden");
     const tbody = table.querySelector("tbody");
     tbody.innerHTML = `
       <tr>
-        <td class="p-2">${data.cidrRange}</td>
-        <td class="p-2">${data.netmask}</td>
-        <td class="p-2">${data.wildcardBits}</td>
-        <td class="p-2 border-2 border-blue-200">${data.firstIp}</td>
-        <td class="p-2">${data.firstIpDecimal}</td>
-        <td class="p-2 border-2 border-blue-200">${data.lastIp}</td>
-        <td class="p-2">${data.lastIpDecimal}</td>
-        <td class="p-2">${data.totalHosts}</td>
+        <td class="p-2">${result.cidrRange}</td>
+        <td class="p-2">${result.netmask}</td>
+        <td class="p-2">${result.wildcardBits}</td>
+        <td class="p-2 border-b-2 border-blue-200">${result.firstIp}</td>
+        <td class="p-2">${result.firstIpDecimal}</td>
+        <td class="p-2 border-b-2 border-blue-200">${result.lastIp}</td>
+        <td class="p-2">${result.lastIpDecimal}</td>
+        <td class="p-2">${result.totalHosts}</td>
       </tr>
     `;
   } catch (error) {
     showError("cidrInput", "Failed to calculate. Please try again.");
+    document.getElementById("cidrResult").classList.add("hidden");
   }
 }
+
+document.getElementById("firstIpInput").addEventListener("input", () => {
+  clearError("ipToCidrError");
+});
+
+document.getElementById("lastIpInput").addEventListener("input", () => {
+  clearError("ipToCidrError");
+});
 
 async function calculateIpToCidr() {
   const firstIp = document.getElementById("firstIpInput").value.trim();
   const lastIp = document.getElementById("lastIpInput").value.trim();
 
-  // Validation
   if (!firstIp || !lastIp) {
-    if (!firstIp) showError("firstIpInput", "Please enter the first IP.");
-    if (!lastIp) showError("lastIpInput", "Please enter the last IP.");
+    if (!firstIp) showError("ipToCidrError", "Please enter the both IPs.");
+    if (!lastIp) showError("ipToCidrError", "Please enter the both IPs.");
     return;
   }
 
   if (!isValidIp(firstIp)) {
-    showError("firstIpInput", "Invalid IP format (e.g., 192.168.1.0).");
+    showError("ipToCidrError", "Invalid IP format (192.168.1.0).");
     return;
   }
 
   if (!isValidIp(lastIp)) {
-    showError("lastIpInput", "Invalid IP format (e.g., 192.168.1.255).");
+    showError("ipToCidrError", "Invalid IP format (192.168.1.255).");
     return;
   }
 
-  // Convert IPs to decimal for comparison
   const firstIpDecimal = ipToDecimal(firstIp);
   const lastIpDecimal = ipToDecimal(lastIp);
 
   if (firstIpDecimal > lastIpDecimal) {
-    showError(
-      "firstIpInput",
-      "First IP must be less than or equal to last IP."
-    );
+    showError("ipToCidrError","First IP must be less than or equal to last IP.");
     return;
   }
 
-  clearError("firstIpInput");
-  clearError("lastIpInput");
+  clearError("ipToCidrError");
 
   try {
     const response = await fetch("/api/v1/ip-to-cidr", {
@@ -279,22 +292,30 @@ async function calculateIpToCidr() {
       body: JSON.stringify({ firstIp, lastIp }),
     });
 
-    if (!response.ok) throw new Error("Server error");
     const data = await response.json();
+
+    if (data.error) {
+      showError("ipToCidrError", data.message);
+      document.getElementById("ipToCidrResult").classList.add("hidden");
+      return;
+    }
+
+    const result = data.result;
 
     const table = document.getElementById("ipToCidrResult");
     table.classList.remove("hidden");
     const tbody = table.querySelector("tbody");
     tbody.innerHTML = `
       <tr>
-        <td class="p-2">${data.ipRange}</td>
-        <td class="p-2">${data.cidrNotation}</td>
-        <td class="p-2">${data.netmask}</td>
-        <td class="p-2">${data.totalHosts}</td>
+        <td class="p-2">${result.ipRange}</td>
+        <td class="p-2">${result.cidrNotation}</td>
+        <td class="p-2">${result.netmask}</td>
+        <td class="p-2">${result.totalHosts}</td>
       </tr>
     `;
   } catch (error) {
-    showError("firstIpInput", "Failed to calculate. Please try again.");
+    showError("ipToCidrError", "Failed to calculate. Please try again.");
+    document.getElementById("ipToCidrResult").classList.add("hidden");
   }
 }
 
@@ -302,35 +323,31 @@ async function calculateAwsSubnets() {
   const cidr = document.getElementById("awsCidrInput").value.trim();
   const numSubnets = document.getElementById("numSubnetsInput").value.trim();
 
-  // Validation
   if (!cidr) {
-    showError("awsCidrInput", "Please enter a CIDR range.");
-    return;
-  }
-  if (!isValidCidr(cidr)) {
-    showError("awsCidrInput", "Invalid CIDR format (e.g., 10.0.0.0/16).");
-    return;
-  }
-  if (!numSubnets || isNaN(numSubnets) || numSubnets <= 0) {
-    showError(
-      "numSubnetsInput",
-      "Please enter a valid number of subnets (e.g., 4)."
-    );
+    showError("awsError", "Please enter a CIDR range.");
     return;
   }
 
-  // Check if the CIDR range can accommodate the requested number of subnets
+  if (!isValidCidr(cidr)) {
+    showError("awsError", "Invalid CIDR format (10.0.0.0/16).");
+    return;
+  }
+
+  if (!numSubnets || isNaN(numSubnets) || numSubnets <= 0) {
+    showError("awsError", "Please enter a valid number of subnets (4).");
+    return;
+  }
+
   const [baseAddr, baseBits] = cidr.split("/");
   const totalHosts = Math.pow(2, 32 - parseInt(baseBits, 10));
   const numSubnetsNum = parseInt(numSubnets, 10);
 
   if (totalHosts / numSubnetsNum < 8) {
-    showError("awsCidrInput", "Too many subnets for the given CIDR range.");
+    showError("awsError", "Too many subnets for the given CIDR range.");
     return;
   }
 
-  clearError("awsCidrInput");
-  clearError("numSubnetsInput");
+  clearError("awsError");
 
   try {
     const response = await fetch("/api/v1/aws-subnets", {
@@ -339,8 +356,15 @@ async function calculateAwsSubnets() {
       body: JSON.stringify({ cidr, numSubnets }),
     });
 
-    if (!response.ok) throw new Error("Server error");
-    const subnets = await response.json();
+    const data = await response.json();
+
+    if (data.error) {
+      showError("awsError", data.message);
+      document.getElementById("awsSubnetsResult").classList.add("hidden");
+      return;
+    }
+
+    const subnets = data.subnets;
 
     const resultDiv = document.getElementById("awsSubnetsResult");
     resultDiv.innerHTML = "";
@@ -384,26 +408,26 @@ async function calculateAwsSubnets() {
       `;
     });
   } catch (error) {
-    showError("awsCidrInput", "Failed to generate subnets. Please try again.");
+    showError("awsError", "Failed to generate subnets. Please try again.");
+    document.getElementById("awsSubnetsResult").classList.add("hidden");
   }
 }
 
 async function checkOverlap() {
   const input = document.getElementById("overlapInput").value.trim();
-  const cidrs = input
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
+  const cidrs = input.split("\n").map((line) => line.trim()).filter(Boolean);
 
   if (cidrs.length < 2) {
-    showError("overlapInput", "Enter at least two CIDRs.");
+    showError("overlapError", "Enter at least two CIDRs.");
     return;
   }
+
   if (!cidrs.every(isValidCidr)) {
-    showError("overlapInput", "All entries must be valid CIDRs.");
+    showError("overlapError", "All entries must be valid CIDRs.");
     return;
   }
-  clearError("overlapInput");
+
+  clearError("overlapError");
 
   try {
     const response = await fetch("/api/v1/check-overlap", {
@@ -422,31 +446,28 @@ async function checkOverlap() {
           .join("")
       : `<p class="text-green-500">${data.overlaps}</p>`;
   } catch (error) {
-    showError("overlapInput", "Failed to check overlaps. Please try again.");
+    showError("overlapError", "Failed to check overlaps. Please try again.");
   }
 }
 
 async function summarizeRoutes() {
   const input = document.getElementById("routeInput").value.trim();
-  const cidrs = input
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
+  const cidrs = input.split("\n").map((line) => line.trim()).filter(Boolean);
 
   if (cidrs.length < 2) {
-    showError("routeInput", "Enter at least two CIDRs.");
+    showError("routeInputError", "Enter at least two CIDRs.");
     return;
   }
 
   if (!cidrs.every(isValidCidr)) {
     showError(
-      "routeInput",
-      "All entries must be valid CIDRs (e.g., 192.168.0.0/24)."
+      "routeInputError",
+      "All entries must be valid CIDRs (192.168.0.0/24)."
     );
     return;
   }
 
-  clearError("routeInput");
+  clearError("routeInputError");
 
   try {
     const response = await fetch("/api/v1/summarize-routes", {
@@ -456,11 +477,17 @@ async function summarizeRoutes() {
     });
 
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Server error");
+
+    if (data.error) {
+      showError("routeInputError", data.message);
+      document.getElementById("routeResult").classList.add("hidden");
+      return;
+    }
 
     const table = document.getElementById("routeTable");
+    document.getElementById("routeResult").classList.remove("hidden");
     table.classList.remove("hidden");
-    document.getElementById("routeError").textContent = "";
+    document.getElementById("routeInputError").textContent = "";
     const tbody = table.querySelector("tbody");
     tbody.innerHTML = `
       <tr>
@@ -471,7 +498,7 @@ async function summarizeRoutes() {
       </tr>
     `;
   } catch (error) {
-    document.getElementById("routeTable").classList.add("hidden");
-    document.getElementById("routeError").textContent = error.message;
+    showError("routeInputError", "Failed to summarize. Please try again.");
+    document.getElementById("routeResult").classList.add("hidden");
   }
 }
