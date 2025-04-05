@@ -331,6 +331,121 @@ ipCIDRCalculator.post("/aws-subnets",
     }
 );
 
+ipCIDRCalculator.post('/aws-subnets-custom', 
+    [
+        body('cidr')
+            .notEmpty().withMessage('CIDR is required')
+            .isString().withMessage('CIDR must be a string')
+            .trim().escape()
+            .isLength({ max: 23 }).withMessage('CIDR must be at most 23 characters long')
+            .customSanitizer(value => {
+                const cleaned = xss(value, {
+                    whiteList: {},
+                    stripIgnoreTag: true,
+                    stripIgnoreTagBody: ['script'],
+                });
+                return cleaned.replace(/&#x2F;/g, "/"); 
+            }),
+        body('hosts')
+            .notEmpty().withMessage('Host counts are required')
+            .isArray({ min: 1 }).withMessage('At least one host count must be provided')
+            .custom((hosts) => {
+                if (!hosts.every(h => Number.isInteger(h) && h > 0)) {
+                    throw new Error('All host counts must be positive integers');
+                }
+                return true;
+            })
+    ], 
+    async (req, res) => {
+        const { cidr, hosts } = req.body;
+        console.log(cidr + '           ' + hosts);
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            const errorMessages = errors.array().map(err => err.msg);
+            return res.status(400).json({
+                error: true,
+                message: errorMessages[0],
+            });
+        }
+
+        if (!isValidCidr(cidr)) {
+            return res.status(400).json({
+                error: true,
+                message: 'Invalid CIDR format (10.0.0.0/16)'
+            });
+        }
+
+        try {
+            const [baseAddr, baseBits] = ipaddr.parseCIDR(cidr);
+            const totalAvailable = Math.pow(2, 32 - baseBits);
+            const awsReserved = 5;
+            let currentIpNum = baseAddr.toByteArray().reduce((acc, val) => acc * 256 + val, 0);
+            let usedHosts = 0;
+
+            const subnets = hosts.map((usableHosts, index) => {
+                const minHosts = usableHosts + awsReserved;
+                const exponent = Math.ceil(Math.log2(minHosts));
+                const subnetSize = Math.pow(2, exponent);
+                const subnetBits = 32 - exponent;
+
+                if (usedHosts + subnetSize > totalAvailable) {
+                    throw new Error(`Subnet ${index + 1} (requesting ${usableHosts} hosts) exceeds available address space`);
+                }
+
+                const firstIp = ipaddr.fromByteArray([
+                        (currentIpNum >> 24) & 255,
+                        (currentIpNum >> 16) & 255,
+                        (currentIpNum >> 8) & 255,
+                        currentIpNum & 255,
+                    ]).toString();
+                const netmask = calculateNetmask(subnetBits);
+                const lastIpNum = currentIpNum + subnetSize - 1;
+                const lastIp = ipaddr.fromByteArray([
+                        (lastIpNum >> 24) & 255,
+                        (lastIpNum >> 16) & 255,
+                        (lastIpNum >> 8) & 255,
+                        lastIpNum & 255,
+                    ]).toString();
+
+                const subnet = {
+                    cidrRange: `${firstIp}/${subnetBits}`,
+                    netmask: netmask,
+                    wildcardBits: getWildcardBits(netmask),
+                    firstIp: firstIp,
+                    firstIpDecimal: currentIpNum,
+                    lastIp: lastIp,
+                    lastIpDecimal: lastIpNum,
+                    totalHosts: subnetSize,
+                    usableHosts: subnetSize - awsReserved,
+                    reservedIps: awsReserved,
+                };
+
+                currentIpNum += subnetSize;
+                usedHosts += subnetSize;
+                return subnet;
+            });
+
+            res.status(201).json({
+                error: false,
+                subnets: subnets
+            });
+        } catch (error) {
+            if (error.message.includes('exceeds available address space')) {
+                return res.status(400).json({
+                    error: true,
+                    message: error.message
+                });
+            }
+
+            res.status(500).json({
+                error: true,
+                message: 'Server error processing subnets'
+            });
+        }
+    }
+);
+
 ipCIDRCalculator.post("/check-overlap", 
     [
         body("cidrs")
