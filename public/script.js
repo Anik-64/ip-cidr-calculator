@@ -64,8 +64,9 @@ function validateAwsInputs() {
     }
     const [_, baseBits] = cidr.split('/');
     const totalHosts = Math.pow(2, 32 - parseInt(baseBits, 10));
-    if (totalHosts / parseInt(numSubnets, 10) < 8) {
-      showError('awsError', 'Too many subnets for the given CIDR range.');
+    const hostsPerSubnet = totalHosts / parseInt(numSubnets, 10);
+    if (hostsPerSubnet < 8) {
+      showError('awsError', 'Each subnet must have at least 3 usable hosts (8 IPs total). Try fewer subnets.');
       return false;
     }
   } else {
@@ -75,6 +76,10 @@ function validateAwsInputs() {
     }
     if (hostInputs.some(h => isNaN(h) || h <= 0)) {
       showError('awsError', 'All host counts must be positive numbers (e.g., 500).');
+      return false;
+    }
+    if (hostInputs.some(h => parseInt(h) < 3)) {
+      showError('awsError', 'Each subnet must have at least 3 usable hosts (8 IPs total).');
       return false;
     }
     const [_, baseBits] = cidr.split('/');
@@ -156,6 +161,7 @@ function clearAwsSection() {
   document.getElementById("customSubnetInputs").innerHTML = `
     <div class="flex gap-2 items-center">
       <input type="number" class="subnet-hosts w-full p-2 border rounded" placeholder="Hosts for Subnet 1 (e.g., 500)" min="1" oninput="validateAwsInputs()">
+      <input type="text" class="subnet-name w-1/2 p-2 border rounded" placeholder="Name (optional)">
       <button class="text-red-500 text-sm font-bold w-6 h-6 flex items-center justify-center border border-red-500 rounded hover:bg-red-100" onclick="this.parentElement.remove(); updatePlaceholders(); validateAwsInputs();">X</button>
     </div>
     <button id="addSubnet" class="text-blue-500 text-sm underline text-left">+ Add Another Subnet</button>
@@ -177,6 +183,10 @@ function clearAwsSection() {
     newInput.placeholder = `Hosts for Subnet ${subnetCount}`;
     newInput.min = "1";
     newInput.oninput = validateAwsInputs;
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.className = "subnet-name w-1/2 p-2 border rounded";
+    nameInput.placeholder = `Name (optional)`;
     const deleteButton = document.createElement("button");
     deleteButton.textContent = "X";
     deleteButton.className ="text-red-500 text-sm font-bold w-6 h-6 flex items-center justify-center border border-red-500 rounded hover:bg-red-100";
@@ -186,11 +196,9 @@ function clearAwsSection() {
       validateAwsInputs();
     };
     inputContainer.appendChild(newInput);
+    inputContainer.appendChild(nameInput);
     inputContainer.appendChild(deleteButton);
-    subnetInputs.insertBefore(
-      inputContainer,
-      document.getElementById("addSubnet")
-    );
+    subnetInputs.insertBefore(inputContainer, document.getElementById("addSubnet"));
     updatePlaceholders();
   });
 }
@@ -395,10 +403,15 @@ document.getElementById("addSubnet").addEventListener("click", () => {
 
   const newInput = document.createElement("input");
   newInput.type = "number";
-  newInput.className = "subnet-hosts w-full p-2 border rounded";
+  newInput.className = "subnet-hosts w-1/2 p-2 border rounded";
   newInput.placeholder = `Hosts for Subnet ${subnetCount}`;
   newInput.min = "1";
   newInput.oninput = validateAwsInputs;
+
+  const nameInput = document.createElement("input");
+  nameInput.type = "text";
+  nameInput.className = "subnet-name w-1/2 p-2 border rounded";
+  nameInput.placeholder = `Name (optional)`;
 
   const deleteButton = document.createElement("button");
   deleteButton.textContent = "X";
@@ -411,12 +424,10 @@ document.getElementById("addSubnet").addEventListener("click", () => {
   };
 
   inputContainer.appendChild(newInput);
+  inputContainer.appendChild(nameInput);
   inputContainer.appendChild(deleteButton);
 
-  subnetInputs.insertBefore(
-    inputContainer,
-    document.getElementById("addSubnet")
-  );
+  subnetInputs.insertBefore(inputContainer, document.getElementById("addSubnet"));
   updatePlaceholders();
 });
 
@@ -453,12 +464,16 @@ async function calculateAwsSubnets() {
     const hosts = Array.from(
       document.getElementsByClassName("subnet-hosts")
     ).map((input) => parseInt(input.value));
+
+    const names = Array.from(document.getElementsByClassName("subnet-name")).map(
+      (input) => input.value.trim() || `Subnet ${Array.from(document.getElementsByClassName("subnet-name")).indexOf(input) + 1}`
+    );
     
     try {
       response = await fetch("/api/v1/aws-subnets-custom", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cidr, hosts }),
+        body: JSON.stringify({ cidr, hosts, names }),
       });
     } catch (error) {
       showError("awsError", "Failed to generate subnets. Please try again.");
@@ -476,7 +491,7 @@ async function calculateAwsSubnets() {
   subnets.forEach((subnet, index) => {
     resultDiv.innerHTML += `
       <div class="bg-gray-50 p-4 rounded-lg shadow">
-        <h3 class="text-lg font-semibold mb-2">Subnet ${index + 1}</h3>
+        <h3 class="text-lg font-semibold mb-2">${subnet.name || `Subnet ${index + 1}`}</h3>
         <table class="w-full">
           <tr><td class="p-2 font-bold">CIDR Range</td><td class="p-2">${
             subnet.cidrRange
