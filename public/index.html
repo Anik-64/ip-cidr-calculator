@@ -36,8 +36,7 @@
       <h2 class="text-lg sm:text-xl font-semibold mb-4">CIDR to IP Range</h2>
       <div class="flex flex-col sm:flex-row gap-2">
         <div class="relative w-full">
-          <input id="cidrInput" type="text" placeholder="e.g., 192.168.1.0/24" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" oninput="validateCidrInput()">
-          <span class="text-xs text-gray-500 mt-1 block">Enter a CIDR (e.g., 192.168.1.0/24).</span>
+          <input id="cidrInput" type="text" placeholder="192.168.1.0/24" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" oninput="validateCidrInput()">
           <span id="cidrInputError" class="text-xs text-red-500 mt-1 hidden"></span>
         </div>
         <div class="flex gap-2">
@@ -71,8 +70,8 @@
     <div class="bg-white p-4 rounded-lg shadow mb-6">
       <h2 class="text-lg sm:text-xl font-semibold mb-4">IP to CIDR</h2>
       <div class="flex flex-col gap-2">
-        <input id="firstIpInput" type="text" placeholder="First IP (e.g., 192.168.1.0)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" oninput="validateIpToCidrInputs()">
-        <input id="lastIpInput" type="text" placeholder="Last IP (e.g., 192.168.1.255)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" oninput="validateIpToCidrInputs()">
+        <input id="firstIpInput" type="text" placeholder="First IP (192.168.1.0)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" oninput="validateIpToCidrInputs()">
+        <input id="lastIpInput" type="text" placeholder="Last IP (192.168.1.255)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" oninput="validateIpToCidrInputs()">
         <div id="ipToCidrError" class="text-xs text-red-500 mt-1 hidden"></div>
         <div class="flex gap-2">
           <button onclick="calculateIpToCidr()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 w-full sm:w-auto">Convert</button>
@@ -101,8 +100,8 @@
     <div class="bg-white p-4 rounded-lg shadow mb-6">
       <h2 class="text-lg sm:text-xl font-semibold mb-4">AWS Subnet Calculator</h2>
       <div class="flex flex-col gap-2">
-        <input id="awsCidrInput" type="text" placeholder="e.g., 10.0.0.0/16" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" oninput="validateAwsInputs()">
-        <input id="numSubnetsInput" type="number" placeholder="Number of Subnets (e.g., 4)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" min="1" oninput="validateAwsInputs()">
+        <input id="awsCidrInput" type="text" placeholder="10.0.0.0/16" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" oninput="validateAwsInputs()">
+        <input id="numSubnetsInput" type="number" placeholder="Number of Subnets (4)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" min="1" oninput="validateAwsInputs()">
         <div id="awsError" class="text-xs text-red-500 mt-1 hidden"></div>
         <div class="flex gap-2">
           <button onclick="calculateAwsSubnets()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 w-full sm:w-auto">Generate Subnets</button>
@@ -119,8 +118,8 @@
     <!-- Subnet Overlap Checker -->
     <div class="bg-white p-4 rounded-lg shadow mb-6">
       <h2 class="text-lg sm:text-xl font-semibold mb-4">Subnet Overlap Checker</h2>
-      <textarea id="overlapInput" placeholder="Enter CIDRs, one per line (e.g., 192.168.1.0/24)" class="w-full p-2 border rounded mb-2 h-24" oninput="validateOverlapInput()"></textarea>
-      <div id="overlapError" class="text-xs text-red-500 mt-1 hidden"></div>
+      <textarea id="overlapInput" placeholder="Enter CIDRs, one per line (192.168.1.0/24)" class="w-full p-2 border rounded mb-2 h-24" oninput="validateOverlapInput()"></textarea>
+      <div id="overlapError" class="text-xs text-red-500 mt-1 mb-1 hidden"></div>
       <div class="flex gap-2">
         <button onclick="checkOverlap()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 w-full sm:w-auto">Check Overlap</button>
         <button onclick="clearOverlapSection()" class="bg-gray-300 text-gray-700 p-2 rounded hover:bg-gray-400 w-full sm:w-auto">Clear</button>
@@ -134,7 +133,7 @@
     <!-- Route Summarization -->
     <div class="bg-white p-4 rounded-lg shadow mb-6">
       <h2 class="text-lg sm:text-xl font-semibold mb-4">Route Summarization</h2>
-      <textarea id="routeInput" placeholder="Enter CIDRs, one per line (e.g., 192.168.0.0/24)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 h-24" oninput="validateRouteInput()"></textarea>
+      <textarea id="routeInput" placeholder="Enter CIDRs, one per line (192.168.0.0/24)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 h-24" oninput="validateRouteInput()"></textarea>
       <div id="routeInputError" class="text-xs text-red-500 mt-1 hidden"></div>
       <div class="flex gap-2">
         <button onclick="summarizeRoutes()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 w-full sm:w-auto mt-2">Summarize</button>
