@@ -1,3 +1,5 @@
+let currentSubnets = null;
+
 // Real-time validation functions
 function validateCidrInput() {
   const input = document.getElementById("cidrInput");
@@ -43,55 +45,78 @@ function validateIpToCidrInputs() {
 }
 
 function validateAwsInputs() {
-  const cidr = document.getElementById('awsCidrInput').value.trim();
+  const cidr = document.getElementById("awsCidrInput").value.trim();
   const mode = document.querySelector('input[name="subnetMode"]:checked').value;
-  const numSubnets = document.getElementById('numSubnetsInput').value.trim();
-  const hostInputs = Array.from(document.getElementsByClassName('subnet-hosts')).map(input => input.value.trim());
+  const numSubnets = document.getElementById("numSubnetsInput").value.trim();
+  const hostInputs = Array.from(
+    document.getElementsByClassName("subnet-hosts")
+  ).map((input) => input.value.trim());
 
   if (!cidr) {
-    showError('awsError', 'Please enter a CIDR range.');
+    showError("awsError", "Please enter a CIDR range.");
     return false;
   }
   if (!isValidCidr(cidr)) {
-    showError('awsError', 'Invalid CIDR format (e.g., 10.0.0.0/16).');
+    showError("awsError", "Invalid CIDR format (e.g., 10.0.0.0/16).");
     return false;
   }
 
-  if (mode === 'equal') {
+  if (mode === "equal") {
     if (!numSubnets || isNaN(numSubnets) || numSubnets <= 0) {
-      showError('awsError', 'Please enter a valid number of subnets (e.g., 4).');
+      showError(
+        "awsError",
+        "Please enter a valid number of subnets (e.g., 4)."
+      );
       return false;
     }
-    const [_, baseBits] = cidr.split('/');
+    const [_, baseBits] = cidr.split("/");
     const totalHosts = Math.pow(2, 32 - parseInt(baseBits, 10));
     const hostsPerSubnet = totalHosts / parseInt(numSubnets, 10);
     if (hostsPerSubnet < 8) {
-      showError('awsError', 'Each subnet must have at least 3 usable hosts (8 IPs total). Try fewer subnets.');
+      showError(
+        "awsError",
+        "Each subnet must have at least 3 usable hosts (8 IPs total). Try fewer subnets."
+      );
       return false;
     }
   } else {
-    if (hostInputs.length === 0 || hostInputs.some(h => !h)) {
-      showError('awsError', 'Please specify at least one subnet with a host count.');
+    if (hostInputs.length === 0 || hostInputs.some((h) => !h)) {
+      showError(
+        "awsError",
+        "Please specify at least one subnet with a host count."
+      );
       return false;
     }
-    if (hostInputs.some(h => isNaN(h) || h <= 0)) {
-      showError('awsError', 'All host counts must be positive numbers (e.g., 500).');
+    if (hostInputs.some((h) => isNaN(h) || h <= 0)) {
+      showError(
+        "awsError",
+        "All host counts must be positive numbers (e.g., 500)."
+      );
       return false;
     }
-    if (hostInputs.some(h => parseInt(h) < 3)) {
-      showError('awsError', 'Each subnet must have at least 3 usable hosts (8 IPs total).');
+    if (hostInputs.some((h) => parseInt(h) < 3)) {
+      showError(
+        "awsError",
+        "Each subnet must have at least 3 usable hosts (8 IPs total)."
+      );
       return false;
     }
-    const [_, baseBits] = cidr.split('/');
+    const [_, baseBits] = cidr.split("/");
     const totalHosts = Math.pow(2, 32 - parseInt(baseBits, 10));
-    const totalRequested = hostInputs.reduce((sum, h) => sum + Math.pow(2, Math.ceil(Math.log2(parseInt(h) + 5))), 0);
+    const totalRequested = hostInputs.reduce(
+      (sum, h) => sum + Math.pow(2, Math.ceil(Math.log2(parseInt(h) + 5))),
+      0
+    );
     if (totalRequested > totalHosts) {
-      showError('awsError', 'Requested host counts exceed available IPs in the CIDR range.');
+      showError(
+        "awsError",
+        "Requested host counts exceed available IPs in the CIDR range."
+      );
       return false;
     }
   }
 
-  clearError('awsError');
+  clearError("awsError");
   return true;
 }
 
@@ -109,8 +134,7 @@ function validateOverlapInput() {
     error.classList.remove("hidden");
   } else if (!cidrs.every(isValidCidr)) {
     input.classList.add("error-border");
-    error.textContent =
-      "All entries must be valid CIDRs (192.168.1.0/24).";
+    error.textContent = "All entries must be valid CIDRs (192.168.1.0/24).";
     error.classList.remove("hidden");
   } else {
     input.classList.remove("error-border");
@@ -132,8 +156,7 @@ function validateRouteInput() {
     error.classList.remove("hidden");
   } else if (!cidrs.every(isValidCidr)) {
     input.classList.add("error-border");
-    error.textContent =
-      "All entries must be valid CIDRs (192.168.0.0/24).";
+    error.textContent = "All entries must be valid CIDRs (192.168.0.0/24).";
     error.classList.remove("hidden");
   } else {
     input.classList.remove("error-border");
@@ -167,14 +190,14 @@ function clearAwsSection() {
     <button id="addSubnet" class="text-blue-500 text-sm underline text-left">+ Add Another Subnet</button>
   `;
   document.getElementById("awsSubnetsResult").innerHTML = "";
-  document.querySelector(
-    'input[name="subnetMode"][value="equal"]'
-  ).checked = true;
+  document.getElementById("downloadSubnets").classList.add("hidden");
+  document.querySelector('input[name="subnetMode"][value="equal"]').checked = true;
   toggleSubnetMode();
   validateAwsInputs();
   document.getElementById("addSubnet").addEventListener("click", () => {
     const subnetInputs = document.getElementById("customSubnetInputs");
-    const subnetCount = subnetInputs.getElementsByClassName("subnet-hosts").length + 1;
+    const subnetCount =
+      subnetInputs.getElementsByClassName("subnet-hosts").length + 1;
     const inputContainer = document.createElement("div");
     inputContainer.className = "flex gap-2 items-center";
     const newInput = document.createElement("input");
@@ -189,7 +212,8 @@ function clearAwsSection() {
     nameInput.placeholder = `Name (optional)`;
     const deleteButton = document.createElement("button");
     deleteButton.textContent = "X";
-    deleteButton.className ="text-red-500 text-sm font-bold w-6 h-6 flex items-center justify-center border border-red-500 rounded hover:bg-red-100";
+    deleteButton.className =
+      "text-red-500 text-sm font-bold w-6 h-6 flex items-center justify-center border border-red-500 rounded hover:bg-red-100";
     deleteButton.onclick = () => {
       inputContainer.remove();
       updatePlaceholders();
@@ -198,7 +222,7 @@ function clearAwsSection() {
     inputContainer.appendChild(newInput);
     inputContainer.appendChild(nameInput);
     inputContainer.appendChild(deleteButton);
-    subnetInputs.insertBefore(inputContainer, document.getElementById("addSubnet"));
+    subnetInputs.insertBefore(inputContainer,document.getElementById("addSubnet"));
     updatePlaceholders();
   });
 }
@@ -238,8 +262,8 @@ function ipToDecimal(ip) {
 
 function toggleSubnetMode() {
   const mode = document.querySelector('input[name="subnetMode"]:checked').value;
-  document.getElementById('equalSubnetInput').classList.toggle('hidden', mode === 'custom');
-  document.getElementById('customSubnetInputs').classList.toggle('hidden', mode === 'equal');
+  document.getElementById("equalSubnetInput").classList.toggle("hidden", mode === "custom");
+  document.getElementById("customSubnetInputs").classList.toggle("hidden", mode === "equal");
   validateAwsInputs();
 }
 
@@ -354,7 +378,10 @@ async function calculateIpToCidr() {
   const lastIpDecimal = ipToDecimal(lastIp);
 
   if (firstIpDecimal > lastIpDecimal) {
-    showError("ipToCidrError","First IP must be less than or equal to last IP.");
+    showError(
+      "ipToCidrError",
+      "First IP must be less than or equal to last IP."
+    );
     return;
   }
 
@@ -465,10 +492,18 @@ async function calculateAwsSubnets() {
       document.getElementsByClassName("subnet-hosts")
     ).map((input) => parseInt(input.value));
 
-    const names = Array.from(document.getElementsByClassName("subnet-name")).map(
-      (input) => input.value.trim() || `Subnet ${Array.from(document.getElementsByClassName("subnet-name")).indexOf(input) + 1}`
+    const names = Array.from(
+      document.getElementsByClassName("subnet-name")
+    ).map(
+      (input) =>
+        input.value.trim() ||
+        `Subnet ${
+          Array.from(document.getElementsByClassName("subnet-name")).indexOf(
+            input
+          ) + 1
+        }`
     );
-    
+
     try {
       response = await fetch("/api/v1/aws-subnets-custom", {
         method: "POST",
@@ -487,11 +522,14 @@ async function calculateAwsSubnets() {
     return;
   }
 
+  currentSubnets = data.subnets;
   const subnets = data.subnets;
   subnets.forEach((subnet, index) => {
     resultDiv.innerHTML += `
       <div class="bg-gray-50 p-4 rounded-lg shadow">
-        <h3 class="text-lg font-semibold mb-2">${subnet.name || `Subnet ${index + 1}`}</h3>
+        <h3 class="text-lg font-semibold mb-2">${
+          subnet.name || `Subnet ${index + 1}`
+        }</h3>
         <table class="w-full">
           <tr><td class="p-2 font-bold">CIDR Range</td><td class="p-2">${
             subnet.cidrRange
@@ -527,6 +565,26 @@ async function calculateAwsSubnets() {
       </div>
     `;
   });
+  document.getElementById("downloadSubnets").classList.remove("hidden");
+}
+
+function downloadSubnets() {
+  if (!currentSubnets) {
+    showError("awsError", "No subnets available to download.");
+    return;
+  }
+
+  const cidr = document.getElementById("awsCidrInput").value.trim() || "subnets";
+  const jsonString = JSON.stringify(currentSubnets, null, 2);
+  const blob = new Blob([jsonString], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${cidr.replace("/", "-")}_subnets.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 async function checkOverlap() {
@@ -568,7 +626,10 @@ async function checkOverlap() {
 
 async function summarizeRoutes() {
   const input = document.getElementById("routeInput").value.trim();
-  const cidrs = input.split("\n").map((line) => line.trim()).filter(Boolean);
+  const cidrs = input
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
 
   if (cidrs.length < 2) {
     showError("routeInputError", "Enter at least two CIDRs.");
