@@ -6,11 +6,22 @@ A web-based tool designed for network engineers to perform IP and CIDR-related c
 
 - **CIDR to IP Range**: Convert CIDR notation (e.g., `192.168.1.0/24`) to detailed IP range information (netmask, wildcard bits, first/last IPs, total hosts).
 - **IP to CIDR**: Convert an IP range (e.g., `192.168.1.0 - 192.168.1.255`) to its CIDR equivalent.
-- **AWS Subnet Calculator**: Generate subnets from a CIDR block, accounting for AWS’s 5 reserved IPs per subnet.
+- **AWS Subnet Calculator**:  
+  - Generate subnets from a CIDR block, respecting AWS’s 5 reserved IPs per subnet.
+  - Supports equal-sized subnets or custom host counts with optional subnet naming (e.g., "Web Servers", "DB Cluster").
+  - Enforces a minimum subnet size of `/29` (3 usable hosts) for AWS compatibility.
+  - Download subnet results as a JSON file for easy sharing or documentation.
 - **Subnet Overlap Checker**: Identify overlaps between multiple CIDR ranges.
 - **Route Summarization**: Combine contiguous CIDR blocks into a single summarized CIDR.
 - **Real-Time Validation**: Instant feedback on input errors with red borders and messages.
 - **SEO Optimized**: Includes metadata, semantic HTML, and keyword-rich content for better search engine visibility.
+- **Security Best Practices**:
+  - Input validation and sanitization with `express-validator`.
+  - JSON parsing with `body-parser` for safe request handling.
+  - XSS protection with the `xss` library to prevent injection attacks.
+  - helmet for securing http headers against XSS, clickjacking, etc.
+  - cors for manages cross-origin requests safely.
+  - express-rate-limit is to protect from abuse or brute-force attacks by limiting the number of requests within a certain time window.
 
 ## Usage
 
@@ -30,8 +41,9 @@ A web-based tool designed for network engineers to perform IP and CIDR-related c
      - Input: `192.168.1.0 - 192.168.1.255`
      - Output: `192.168.1.0/24`
    - **AWS Subnet Calculator**:
-     - Input: `10.0.0.0/16`, 4 subnets
-     - Output: Four `/18` subnets (e.g., `10.0.0.0/18`, `10.0.64.0/18`, etc.)
+     - Input: `10.0.0.0/16`, Custom Hosts: `[500, 100]`, Names: `["Web Servers", "DB Cluster"]`
+     - Output: Web Servers: 10.0.0.0/23 (507 usable hosts), DB Cluster: 10.0.2.0/25 (123 usable hosts)
+     - Download: `10.0.0.0-16_subnets.json`
    - **Subnet Overlap Checker**:
      - Input: `192.168.1.0/24`, `192.168.1.128/25`
      - Output: "192.168.1.0/24 overlaps with 192.168.1.128/25"
