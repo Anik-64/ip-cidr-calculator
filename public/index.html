@@ -125,6 +125,7 @@
         <div class="flex gap-2">
           <button onclick="calculateAwsSubnets()" class="bg-blue-500 text-white h-9 px-4 rounded hover:bg-blue-600 w-full sm:w-auto">Generate Subnets</button>
           <button onclick="clearAwsSection()" class="bg-gray-300 text-gray-700 h-9 px-4 rounded hover:bg-gray-400 w-full sm:w-auto">Clear</button>
+          <button id="downloadSubnets" onclick="downloadSubnets()" class="bg-green-500 text-white h-9 px-4 rounded hover:bg-green-600 w-full sm:w-auto hidden">Download Subnets as json</button>
         </div>
         <div class="text-xs text-gray-500 mt-2">
           Note: AWS reserves 5 IPs per subnet (network, broadcast, and 3 for services).
