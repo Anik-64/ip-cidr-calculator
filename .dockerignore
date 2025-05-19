@@ -4,3 +4,4 @@ node_modules
 Dockerfile
 .dockerignore
 README.md
+setup.bat
