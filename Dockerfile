@@ -5,6 +5,10 @@ RUN npm install
 COPY . .
 
 FROM node:20-alpine
+
+# To check health of container
+RUN apk add --no-cache curl
+
 WORKDIR /usr/src/ipcidrcalculator
 COPY --from=builder /usr/src/ipcidrcalculator/node_modules ./node_modules
 COPY --from=builder /usr/src/ipcidrcalculator/package.json ./
