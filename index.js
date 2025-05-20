@@ -75,5 +75,5 @@ app.get("/healthcheck", (req, res) => {
 app.use("/api/v1", ipCIDRCalculator);
 
 app.listen(process.env.PORT, () => {
-  console.log(`Server running at http://localhost:${process.env.PORT}`);
+  console.log(`Server(${process.env.APP_NAME || ''}) running at http://localhost:${process.env.PORT}`);
 });
