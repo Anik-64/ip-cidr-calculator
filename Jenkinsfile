@@ -1,7 +1,7 @@
 pipeline {
     agent any
 
-    environtment {
+    environment {
         DOCKER_TAG = "v1.${BUILD_NUMBER}"
     }
 
