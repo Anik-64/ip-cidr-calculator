@@ -20,5 +20,11 @@ pipeline {
                 sh 'docker logout'
             }
         }
+
+        stage('finish') {
+            step {
+                echo 'Successufull!!!'
+            }
+        }
     }
 }
