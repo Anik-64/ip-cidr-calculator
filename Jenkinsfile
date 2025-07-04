@@ -4,8 +4,9 @@ pipeline {
     stages {
         stage('build') {
             steps {
+                def versionTag = "v1.${BUILD_NUMBER}"
                 sh 'docker build -t beekeeper27/ipcidrcalculator:1 .'
-                sh 'docker tag beekeeper27/ipcidrcalculator:1 beekeeper27/ipcidrcalculator:$BUILD_NUMBER'
+                sh "docker tag beekeeper27/ipcidrcalculator:1 beekeeper27/ipcidrcalculator:${versionTag}"
             }
         }
 
