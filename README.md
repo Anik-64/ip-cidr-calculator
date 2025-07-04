@@ -4,8 +4,8 @@ A web-based tool designed for network engineers to perform IP and CIDR-related c
 
 ## Features
 
-- **CIDR to IP Range**: Convert CIDR notation (e.g., `192.168.1.0/24`) to detailed IP range information (netmask, wildcard bits, first/last IPs, total hosts).
-- **IP to CIDR**: Convert an IP range (e.g., `192.168.1.0 - 192.168.1.255`) to its CIDR equivalent.
+- **CIDR to IP Range**: Convert CIDR notation (`192.168.1.0/24`) to detailed IP range information (netmask, wildcard bits, first/last IPs, total hosts).
+- **IP to CIDR**: Convert an IP range (`192.168.1.0 - 192.168.1.255`) to its CIDR equivalent.
 - **AWS Subnet Calculator**:  
   - Generate subnets from a CIDR block, respecting AWS’s 5 reserved IPs per subnet.
   - Supports equal-sized subnets or custom host counts with optional subnet naming (e.g., "Web Servers", "DB Cluster").
