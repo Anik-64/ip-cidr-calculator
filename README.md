@@ -76,6 +76,39 @@ If you prefer to run the application using Docker, follow these steps:
    docker stop <container-id>
    ```
 
+## Jenkins Pipeline CI/CD Setup
+
+1. **GitHub Webhook Configuration**
+     - Go to your GitHub repo → Settings → Webhooks → Add webhook
+     - Set the following values:
+         - Payload URL: `http://<YOUR_JENKINS_IP>:8080/github-webhook/`
+         - Content type: `application/json`
+         - Trigger: `Only Just the push event`
+       - Click **Add Webhook**
+2. **Jenkins Credentials (DockerHub)**
+     In Jenkins:
+     - Go to `Manage Jenkins → Credentials`
+     - Choose global or folder scope
+     - Click Add Credentials:
+         - Type: `Username with password`
+         - ID: `{YOUR_ID}`
+         - Username: Your DockerHub `username`
+         - Password: Your DockerHub `access token or password`
+3. **Jenkins Credentials (DockerHub)**
+     - Create a new Pipeline job
+     - Under Build Triggers, check:
+          - ✅ GitHub hook trigger for GITScm polling
+     - Under Pipeline section:
+         - Definition: `Pipeline script from SCM`
+         - SCM: `Git`
+         - Repository URL:
+           ```bash
+           https://github.com/Anik-64/ip-cidr-calculator.git
+           ```
+         - Branches to build: `main` or `master`
+         - Script Path: `Jenkinsfile`
+      - Click **Save**  
+
 ## Contributing
 
 1. Fork the repository.
