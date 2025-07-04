@@ -3,27 +3,27 @@ pipeline {
 
     stages {
         stage('build') {
-            step {
+            steps {
                 sh 'docker build -t beekeeper27/ipcidrcalculator:1 .'
                 sh 'docker tag beekeeper27/ipcidrcalculator:1 beekeeper27/ipcidrcalculator:$BUILD_NUMBER'
             }
         }
 
         stage('push') {
-            step {
+            steps {
                 sh 'echo "dckr_pat_pmElttIkTLk0pJCSWbJb3YUhtzw" | docker login -u beekeeper27 --password-stdin'
                 sh 'docker push beekeeper27/ipcidrcalculator:$BUILD_NUMBER'
             }
         }
 
         stage('logout') {
-            step {
+            steps {
                 sh 'docker logout'
             }
         }
 
         stage('finish') {
-            step {
+            steps {
                 echo 'Successufull!'
             }
         }
