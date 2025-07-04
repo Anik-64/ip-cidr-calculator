@@ -8,15 +8,19 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                sh 'docker build -t beekeeper27/ipcidrcalculator:1 .'
-                sh "docker tag beekeeper27/ipcidrcalculator:1 beekeeper27/ipcidrcalculator:${DOCKER_TAG}"
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'password', usernameVariable: 'username')]) {
+                    sh 'docker build -t ${username}/ipcidrcalculator:1 .'
+                    sh "docker tag ${username}/ipcidrcalculator:1 ${username}/ipcidrcalculator:${DOCKER_TAG}"
+                }
             }
         }
 
         stage('push') {
             steps {
-                sh 'echo "dckr_pat_ge_j-D0U-n6Rp-I1OiTbjECorkM" | docker login -u beekeeper27 --password-stdin'
-                sh "docker push beekeeper27/ipcidrcalculator:${DOCKER_TAG}"
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'password', usernameVariable: 'username')]) {
+                    sh 'echo ${password} | docker login -u ${username} --password-stdin'
+                    sh "docker push ${username}/ipcidrcalculator:${DOCKER_TAG}"
+                }
             }
         }
 
