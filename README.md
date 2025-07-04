@@ -109,7 +109,7 @@ If you prefer to run the application using Docker, follow these steps:
          - Script Path: `Jenkinsfile`
       - Click **Save**  
 
-<img src="public/logo/pipeline_overview.png" alt="pipeline_overview" width="300" height="200" />
+<img src="public/logo/pipeline_overview.png" alt="pipeline_overview" width="700" height="200" />
 
 ## Contributing
 
