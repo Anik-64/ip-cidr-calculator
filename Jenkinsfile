@@ -24,7 +24,7 @@ pipeline {
 
         stage('finish') {
             steps {
-                echo 'Successufull!'
+                echo 'Successufull!!!!'
             }
         }
     }
