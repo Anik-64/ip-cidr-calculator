@@ -15,7 +15,7 @@ pipeline {
 
         stage('push') {
             steps {
-                sh 'echo "dckr_pat_pmElttIkTLk0pJCSWbJb3YUhtzw" | docker login -u beekeeper27 --password-stdin'
+                sh 'echo "dckr_pat_ge_j-D0U-n6Rp-I1OiTbjECorkM" | docker login -u beekeeper27 --password-stdin'
                 sh 'docker push beekeeper27/ipcidrcalculator:$BUILD_NUMBER'
             }
         }
