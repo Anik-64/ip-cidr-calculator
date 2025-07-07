@@ -1,0 +1,43 @@
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'BUILD_VERSION', defaultValue: '', description: 'Specify the build version (e.g., 1.0.0). Leave empty to use default tag.')
+    }
+
+    environment {
+        DOCKER_TAG = "${params.BUILD_VERSION != '' ? params.BUILD_VERSION : "v1.${BUILD_NUMBER}"}"
+    }
+
+    stages {
+        stage('build') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'password', usernameVariable: 'username')]) {
+                    sh 'docker build -t ${username}/ipcidrcalculator:latest .'
+                    sh 'docker tag ${username}/ipcidrcalculator:latest ${username}/ipcidrcalculator:${DOCKER_TAG}'
+                }
+            }
+        }
+
+        stage('push') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'password', usernameVariable: 'username')]) {
+                    sh 'echo ${password} | docker login -u ${username} --password-stdin'
+                    sh 'docker push ${username}/ipcidrcalculator:${DOCKER_TAG}'
+                }
+            }
+        }
+
+        stage('logout') {
+            steps {
+                sh 'docker logout'
+            }
+        }
+
+        stage('finish') {
+            steps {
+                echo "Build and push completed with tag: ${DOCKER_TAG}"
+            }
+        }
+    }
+}
