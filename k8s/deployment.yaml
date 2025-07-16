@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ipcidrcalculator
+spec:
+  selector:
+    matchLabels:
+      app: ipcidrcalculator
+  template:
+    metadata:
+      labels:
+        app: ipcidrcalculator
+    spec:
+      containers:
+      - name: ipcidrcalculator
+        image: beekeeper27/ip-cidr-calculator:v1.3
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
