@@ -2,13 +2,22 @@ pipeline {
     agent any
 
     environment {
-        DATE_TAG = "${BUILD_NUMBER}-$(date +%d-%m-%H-%M)"
+        // DATE_TAG = "${BUILD_NUMBER}-$(date +%d-%m-%H-%M)"
         IMAGE_NAME = "ipcidrcalculator"
         COMPOSE_PATH = "/var/www/app/docker-compose.yaml"
         // GCHAT_WEBHOOK = credentials('gchat-webhook') 
     }
 
     stages {
+
+        stage('Init Variables') {
+            steps {
+                script {
+                    def timestamp = sh(script: "date +%d-%m-%H-%M", returnStdout: true).trim()
+                    env.DATE_TAG = "${BUILD_NUMBER}-${timestamp}"
+                }
+            }
+        }
 
         stage('Checkout Code') {
             steps {
