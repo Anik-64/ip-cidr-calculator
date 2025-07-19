@@ -93,8 +93,9 @@ pipeline {
                         git add .
                         git commit -m "Auto update: docker-compose image tag ${DATE_TAG}" || echo "No changes to commit"
                         git config --global credential.helper store
-                        echo "https://${GIT_USER}:${GIT_PASS}@github.com/Anik-64/ip-cidr-calculator.git" > ~/.git-credentials
+                        echo "https://${GIT_USER}:${GIT_PASS}@github.com/${GIT_USER}/ip-cidr-calculator.git" > ~/.git-credentials
                         git push origin main
+                        rm -f ~/.git-credentials
                     '''
                 }
             }
