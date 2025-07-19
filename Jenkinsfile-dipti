@@ -87,16 +87,14 @@ pipeline {
         stage('Push Updated Code to Repo') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'github', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
-                    sh """
+                    sh '''
                         git checkout main
                         git pull origin main
                         git add .
                         git commit -m "Auto update: docker-compose image tag ${DATE_TAG}" || echo "No changes to commit"
-                        git config --global credential.helper store
-                        echo "https://${GIT_USER}:${GIT_PASS}@github.com/${GIT_USER}/ip-cidr-calculator.git" > ~/.git-credentials
+                        git remote set-url origin https://${GIT_USER}:${GIT_PASS}@github.com/${GIT_USER}/ip-cidr-calculator.git
                         git push origin main
-                        rm -f ~/.git-credentials
-                    """
+                    '''
                 }
             }
         }
