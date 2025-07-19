@@ -1,0 +1,98 @@
+pipeline {
+    agent any
+
+    environment {
+        DATE_TAG = "${BUILD_NUMBER}-$(date +%d-%m-%H-%M)"
+        IMAGE_NAME = "ipcidrcalculator"
+        COMPOSE_PATH = "/var/www/app/docker-compose.yaml"
+        // GCHAT_WEBHOOK = credentials('gchat-webhook') 
+    }
+
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh '''
+                        docker build -t ${USERNAME}/${IMAGE_NAME}:latest .
+                        docker tag ${USERNAME}/${IMAGE_NAME}:latest ${USERNAME}/${IMAGE_NAME}:${DATE_TAG}
+                    '''
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh '''
+                        echo ${PASSWORD} | docker login -u ${USERNAME} --password-stdin
+                        docker push ${USERNAME}/${IMAGE_NAME}:${DATE_TAG}
+                    '''
+                }
+            }
+        }
+
+        stage('Docker Logout') {
+            steps {
+                sh 'docker logout'
+            }
+        }
+
+        stage('Update Docker Compose and Restart App') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh '''
+                        sed -i "s|image: ${USERNAME}/${IMAGE_NAME}:.*|image: ${USERNAME}/${IMAGE_NAME}:${DATE_TAG}|" ${COMPOSE_PATH}
+                        cd /var/www/app
+                        docker-compose pull
+                        docker-compose down
+                        docker-compose up -d
+                    '''
+                }
+            }
+        }
+
+        // stage('Send Google Chat Notification') {
+        //     steps {
+        //         script {
+        //             def msg = """
+        //             {
+        //                 "text": "✅ Your application has been updated.\\nImage: ${IMAGE_NAME}:${DATE_TAG}"
+        //             }
+        //             """
+        //             sh """
+        //                 curl -X POST -H 'Content-Type: application/json' \
+        //                 -d '${msg}' \
+        //                 ${GCHAT_WEBHOOK}
+        //             """
+        //         }
+        //     }
+        // }
+
+        stage('Push Updated Code to Repo') {
+            steps {
+                sh '''
+                    git add .
+                    git commit -m "Auto update: docker-compose image tag ${DATE_TAG}" || echo "No changes to commit"
+                    git push origin main
+                '''
+            }
+        }
+
+    }
+
+    post {
+        failure {
+            echo 'Pipeline failed!'
+        }
+        cleanup {
+            cleanWs()
+        }
+    }
+}
