@@ -57,11 +57,11 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                     sh '''
-                        sudo sed -i "s|image: ${USERNAME}/${IMAGE_NAME}:.*|image: ${USERNAME}/${IMAGE_NAME}:${DATE_TAG}|" ${COMPOSE_PATH}
+                        sed -i "s|image: ${USERNAME}/${IMAGE_NAME}:.*|image: ${USERNAME}/${IMAGE_NAME}:${DATE_TAG}|" ${COMPOSE_PATH}
                         cd /var/www/app
-                        sudo docker-compose pull
-                        sudo docker-compose down
-                        sudo docker-compose up -d
+                        docker-compose pull
+                        docker-compose down
+                        docker-compose up -d
                     '''
                 }
             }
