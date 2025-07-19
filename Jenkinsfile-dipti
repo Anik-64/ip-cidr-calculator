@@ -86,13 +86,16 @@ pipeline {
 
         stage('Push Updated Code to Repo') {
             steps {
-                sh '''
-                    git checkout main
-                    git pull origin main
-                    git add .
-                    git commit -m "Auto update: docker-compose image tag ${DATE_TAG}" || echo "No changes to commit"
-                    git push origin main
-                '''
+                withCredentials([usernamePassword(credentialsId: 'github', usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
+                    sh '''
+                        git checkout main
+                        git pull origin main
+                        git add .
+                        git commit -m "Auto update: docker-compose image tag ${DATE_TAG}" || echo "No changes to commit"
+                        git remote set-url origin https://${GIT_USER}:${GIT_PASS}@github.com/Anik-64/ip-cidr-calculator.git
+                        git push origin main
+                    '''
+                }
             }
         }
 
