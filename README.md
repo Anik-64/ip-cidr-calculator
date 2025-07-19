@@ -126,3 +126,4 @@ If you prefer to run the application using Docker, follow these steps:
 ## Contact
 
 For questions or feedback, reach out to anikmajumder303@gmail.com or open an issue on GitHub.
+
