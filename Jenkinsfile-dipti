@@ -2,10 +2,9 @@ pipeline {
     agent any
 
     environment {
-        // DATE_TAG = "${BUILD_NUMBER}-$(date +%d-%m-%H-%M)"
         IMAGE_NAME = "ipcidrcalculator"
         COMPOSE_PATH = "/var/www/app/docker-compose.yaml"
-        // GCHAT_WEBHOOK = credentials('gchat-webhook') 
+        GCHAT_WEBHOOK = credentials('gchat-webhook') 
     }
 
     stages {
@@ -67,22 +66,22 @@ pipeline {
             }
         }
 
-        // stage('Send Google Chat Notification') {
-        //     steps {
-        //         script {
-        //             def msg = """
-        //             {
-        //                 "text": "✅ Your application has been updated.\\nImage: ${IMAGE_NAME}:${DATE_TAG}"
-        //             }
-        //             """
-        //             sh """
-        //                 curl -X POST -H 'Content-Type: application/json' \
-        //                 -d '${msg}' \
-        //                 ${GCHAT_WEBHOOK}
-        //             """
-        //         }
-        //     }
-        // }
+        stage('Send Google Chat Notification') {
+            steps {
+                script {
+                    def msg = """
+                    {
+                        "text": "✅ Your application has been updated.\\nImage: ${IMAGE_NAME}:${DATE_TAG}"
+                    }
+                    """
+                    sh """
+                        curl -X POST -H 'Content-Type: application/json' \
+                        -d '${msg}' \
+                        ${GCHAT_WEBHOOK}
+                    """
+                }
+            }
+        }
 
         stage('Push Updated Code to Repo') {
             steps {
