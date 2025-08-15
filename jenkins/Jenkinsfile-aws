@@ -35,7 +35,7 @@ pipeline {
                         docker pull ${username}/${DOCKER_IMAGE}:${DOCKER_TAG}
                         docker stop ipcidrcalculator || true
                         docker rm ipcidrcalculator || true
-                        docker run -d --name ipcidrcalculator -p 3001:${params.APP_PORT} ${username}/${DOCKER_IMAGE}:${DOCKER_TAG}
+                        docker run -d --name ipcidrcalculator -p 3001:${params.APP_PORT} -e PORT=${params.APP_PORT} ${username}/${DOCKER_IMAGE}:${DOCKER_TAG}
                         docker image prune -f
                     """
                 }
