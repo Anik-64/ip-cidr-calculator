@@ -3,6 +3,7 @@ const rateLimit = require("express-rate-limit");
 const cors = require("cors");
 const helmet = require("helmet");
 const ipCIDRCalculator = require('./server/server');
+const path = require('path');
 
 const app = express();
 
@@ -17,7 +18,21 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 app.use(express.json());
-app.use(express.static("public"));
+// app.use(express.static("public"));
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/', (req, res) => {
+    res.redirect('/ip-cidr-calculator');
+});
+
+app.get('/ip-cidr-calculator', async (req, res) => {
+    res.render('pages/ip', {
+        layout: false, 
+        title: 'IP CIDR Calculator'
+    });
+});
 
 const limiter = rateLimit({
   windowMs: 60 * 60 * 1000,
@@ -74,6 +89,12 @@ app.get("/healthcheck", (req, res) => {
 
 app.use("/api/v1", ipCIDRCalculator);
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server(${process.env.APP_NAME || ''}) running at http://localhost:${process.env.PORT}`);
-});
+// app.listen(process.env.PORT, () => {
+//   console.log(`Server(${process.env.APP_NAME || ''}) running at http://localhost:${process.env.PORT}`);
+// });
+
+if (require.main === module) {
+    app.listen(process.env.PORT || 3000, () => console.log(`Running locally on port ${process.env.PORT || 3000}`));
+}
+
+module.exports = app;
