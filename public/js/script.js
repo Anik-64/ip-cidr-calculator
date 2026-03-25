@@ -1,20 +1,28 @@
 let currentSubnets = null;
 
 // Real-time validation functions
-function validateCidrInput() {
-  const input = document.getElementById("cidrInput");
+function validateIpOnlyInput() {
+  const input = document.getElementById("ipOnlyInput");
   const error = document.getElementById("cidrInputError");
   if (!input.value.trim()) {
     input.classList.add("error-border");
-    error.textContent = "Please enter a CIDR.";
+    error.textContent = "Please enter an IP Address.";
     error.classList.remove("hidden");
-  } else if (!isValidCidr(input.value.trim())) {
+  } else if (!isValidIp(input.value.trim())) {
     input.classList.add("error-border");
-    error.textContent = "Invalid CIDR format (192.168.1.0/24).";
+    error.textContent = "Invalid IP format (e.g., 192.168.1.0).";
     error.classList.remove("hidden");
   } else {
     input.classList.remove("error-border");
     error.classList.add("hidden");
+  }
+}
+
+function updateSubnetMaskDisplay() {
+  const mask = document.getElementById("subnetMaskInput").value;
+  document.getElementById("subnetMaskDisplay").innerText = "/" + mask;
+  if(document.getElementById("ipOnlyInput").value.trim()) {
+    validateIpOnlyInput();
   }
 }
 
@@ -166,9 +174,11 @@ function validateRouteInput() {
 
 // Clear section functions
 function clearCidrSection() {
-  document.getElementById("cidrInput").value = "";
+  document.getElementById("ipOnlyInput").value = "";
+  document.getElementById("subnetMaskInput").value = "24";
+  updateSubnetMaskDisplay();
   document.getElementById("cidrResult").classList.add("hidden");
-  validateCidrInput();
+  validateIpOnlyInput();
 }
 
 function clearIpToCidrSection() {
@@ -290,25 +300,27 @@ function clearError(elementId) {
   }
 }
 
-document.getElementById("cidrInput").addEventListener("input", () => {
+document.getElementById("ipOnlyInput").addEventListener("input", () => {
   clearError("cidrInputError");
 });
 
 async function calculateCidrToIp() {
-  const cidr = document.getElementById("cidrInput").value.trim();
+  const ipPart = document.getElementById("ipOnlyInput").value.trim();
+  const maskPart = document.getElementById("subnetMaskInput").value;
 
-  if (!cidr) {
-    showError("cidrInputError", "Please enter a CIDR range.");
+  if (!ipPart) {
+    showError("cidrInputError", "Please enter an IP Address.");
     document.getElementById("cidrResult").classList.add("hidden");
     return;
   }
 
-  if (!isValidCidr(cidr)) {
-    showError("cidrInputError", "Invalid CIDR format (192.168.1.0/24).");
+  if (!isValidIp(ipPart)) {
+    showError("cidrInputError", "Invalid IP format (e.g., 192.168.1.0).");
     document.getElementById("cidrResult").classList.add("hidden");
     return;
   }
 
+  const cidr = `${ipPart}/${maskPart}`;
   clearError("cidrInputError");
 
   try {
@@ -344,7 +356,7 @@ async function calculateCidrToIp() {
       </tr>
     `;
   } catch (error) {
-    showError("cidrInput", "Failed to calculate. Please try again.");
+    showError("cidrInputError", "Failed to calculate. Please try again.");
     document.getElementById("cidrResult").classList.add("hidden");
   }
 }

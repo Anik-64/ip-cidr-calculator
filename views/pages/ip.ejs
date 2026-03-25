@@ -27,10 +27,10 @@
 <body class="bg-gray-100 p-4 sm:p-6 min-h-screen flex flex-col">
   <div class="max-w-7xl mx-auto w-full flex-grow">
     <div class="text-center mb-10 mt-6 relative">
-      <div class="inline-flex items-center gap-2 mb-4 bg-indigo-50 text-indigo-700 px-4 py-1.5 rounded-full text-sm font-semibold tracking-wide border border-indigo-100 shadow-sm hover:shadow-md transition-shadow cursor-default">
+      <!-- <div class="inline-flex items-center gap-2 mb-4 bg-indigo-50 text-indigo-700 px-4 py-1.5 rounded-full text-sm font-semibold tracking-wide border border-indigo-100 shadow-sm hover:shadow-md transition-shadow cursor-default">
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11a1 1 0 11-2 0V9a1 1 0 112 0v4zm-1-7a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg>
         Network Engineer Toolkit
-      </div>
+      </div> -->
       <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-gray-900 mb-4">
         <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 drop-shadow-sm">IP/CIDR</span> Calculator
       </h1>
@@ -57,19 +57,47 @@
     <!-- CIDR to IP Range -->
     <div id="section-cidr" class="calc-section bg-gradient-to-br from-white to-gray-50 p-6 sm:p-8 rounded-xl border border-gray-100 shadow hover:shadow-lg transition-all duration-300 mb-6">
       <h2 class="text-xl sm:text-2xl font-bold text-indigo-900 mb-6">CIDR to IP Range</h2>
-      <div class="flex flex-col sm:flex-row gap-4">
-        <div class="relative w-full">
-          <input id="cidrInput" type="text" placeholder="192.168.1.0/24" class="w-full p-3 bg-gray-50 border border-gray-200 text-gray-900 rounded-lg focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 focus:bg-white focus:outline-none transition-all duration-200 shadow-inner" oninput="validateCidrInput()">
-          <span id="cidrInputError" class="text-xs text-red-500 mt-1 pl-1 hidden font-medium"></span>
+      <div class="flex flex-col gap-6 w-full">
+        <!-- Input and Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4">
+          <div class="relative w-full">
+            <label class="block text-sm font-semibold text-gray-700 mb-1">IP Address</label>
+            <input id="ipOnlyInput" type="text" placeholder="192.168.1.0" class="w-full p-3 bg-gray-50 border border-gray-200 text-gray-900 rounded-lg focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 focus:bg-white focus:outline-none transition-all duration-200 shadow-inner" oninput="validateIpOnlyInput()">
+            <span id="cidrInputError" class="text-xs text-red-500 mt-1 pl-1 hidden font-medium"></span>
+          </div>
+          <div class="flex gap-3 items-end h-[74px]">
+            <button onclick="calculateCidrToIp()" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium px-6 rounded-lg shadow-md hover:shadow-lg transform transition-all duration-200 hover:-translate-y-0.5 w-full sm:w-auto h-[50px]">Calculate</button>
+            <button onclick="clearCidrSection()" class="bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 px-6 rounded-lg shadow-sm hover:shadow transform transition-all duration-200 hover:-translate-y-0.5 w-full sm:w-auto h-[50px]">Clear</button>
+          </div>
         </div>
-        <div class="flex gap-3 h-[50px]">
-          <button onclick="calculateCidrToIp()" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium px-6 rounded-lg shadow-md hover:shadow-lg transform transition-all duration-200 hover:-translate-y-0.5 w-full sm:w-auto">Calculate</button>
-          <button onclick="clearCidrSection()" class="bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 px-6 rounded-lg shadow-sm hover:shadow transform transition-all duration-200 hover:-translate-y-0.5 w-full sm:w-auto">Clear</button>
+        
+        <!-- Slider Section for Subnet Mask -->
+        <div class="w-full bg-white border border-gray-100 shadow-sm p-4 rounded-lg relative">
+          <div class="flex justify-between items-center mb-4">
+            <label for="subnetMaskInput" class="text-sm font-semibold text-gray-700 flex items-center gap-2">
+              <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+              Subnet Mask
+            </label>
+            <span id="subnetMaskDisplay" class="text-lg font-bold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-md border border-indigo-100 shadow-sm w-14 text-center">/24</span>
+          </div>
+          
+          <div class="relative w-full pb-6 px-1">
+            <input id="subnetMaskInput" type="range" min="0" max="32" value="24" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600" oninput="updateSubnetMaskDisplay()">
+            
+            <div class="flex justify-between text-xs text-gray-400 mt-3 absolute w-full font-medium pointer-events-none">
+              <span class="flex flex-col items-center"><div class="w-1 h-1.5 bg-gray-300 mb-1 rounded-full"></div>/0</span>
+              <span class="flex flex-col items-center"><div class="w-1 h-1.5 bg-gray-300 mb-1 rounded-full"></div>/8</span>
+              <span class="flex flex-col items-center"><div class="w-1 h-1.5 bg-gray-300 mb-1 rounded-full"></div>/16</span>
+              <span class="flex flex-col items-center"><div class="w-1 h-1.5 bg-gray-300 mb-1 rounded-full"></div>/24</span>
+              <span class="flex flex-col items-center"><div class="w-1 h-1.5 bg-gray-300 mb-1 rounded-full"></div>/32</span>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="text-sm text-gray-500 mt-4 flex items-center gap-2">
+      
+      <div class="text-sm text-gray-500 mt-6 flex items-center gap-2">
         <span>Try it out:</span> 
-        <button class="text-xs bg-indigo-50 text-indigo-600 font-semibold px-3 py-1.5 rounded-full hover:bg-indigo-100 shadow-sm transition-all duration-200" onclick="document.getElementById('cidrInput').value='192.168.1.0/24'; validateCidrInput(); calculateCidrToIp();">192.168.1.0/24</button>
+        <button class="text-xs bg-indigo-50 text-indigo-600 font-semibold px-3 py-1.5 rounded-full hover:bg-indigo-100 shadow-sm transition-all duration-200" onclick="document.getElementById('ipOnlyInput').value='192.168.1.0'; document.getElementById('subnetMaskInput').value=24; updateSubnetMaskDisplay(); calculateCidrToIp();">192.168.1.0/24</button>
       </div>
       <div class="overflow-x-auto mt-4">
         <table id="cidrResult" class="w-full min-w-[640px] hidden border-collapse">
