@@ -99,21 +99,21 @@
         <span>Try it out:</span> 
         <button class="text-xs bg-indigo-50 text-indigo-600 font-semibold px-3 py-1.5 rounded-full hover:bg-indigo-100 shadow-sm transition-all duration-200" onclick="document.getElementById('ipOnlyInput').value='192.168.1.0'; document.getElementById('subnetMaskInput').value=24; updateSubnetMaskDisplay(); calculateCidrToIp();">192.168.1.0/24</button>
       </div>
-      <div class="overflow-x-auto mt-4">
-        <table id="cidrResult" class="w-full min-w-[640px] hidden border-collapse">
-          <thead>
-            <tr class="bg-gray-200 text-sm sm:text-base">
-              <th class="p-2 text-left" title="The input CIDR range">CIDR Range</th>
-              <th class="p-2 text-left" title="Subnet mask">Netmask</th>
-              <th class="p-2 text-left" title="Inverse of the netmask">Wildcard Bits</th>
-              <th class="p-2 text-left" title="First IP in the range">First IP</th>
-              <th class="p-2 text-left" title="First IP in decimal">First IP (Dec)</th>
-              <th class="p-2 text-left" title="Last IP in the range">Last IP</th>
-              <th class="p-2 text-left" title="Last IP in decimal">Last IP (Dec)</th>
-              <th class="p-2 text-left" title="Total IPs in the range">Total Hosts</th>
+      <div id="cidrResultWrapper" class="overflow-x-auto mt-6 rounded-xl border border-gray-200 shadow-sm hidden">
+        <table id="cidrResult" class="w-full min-w-[640px] border-collapse bg-white">
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr class="text-xs font-bold text-gray-500 uppercase tracking-wider text-left">
+              <th class="px-5 py-4" title="The input CIDR range">CIDR Range</th>
+              <th class="px-5 py-4" title="Subnet mask">Netmask</th>
+              <th class="px-5 py-4" title="Inverse of the netmask">Wildcard Bits</th>
+              <th class="px-5 py-4" title="First IP in the range">First IP</th>
+              <th class="px-5 py-4" title="First IP in decimal">First IP (Dec)</th>
+              <th class="px-5 py-4" title="Last IP in the range">Last IP</th>
+              <th class="px-5 py-4" title="Last IP in decimal">Last IP (Dec)</th>
+              <th class="px-5 py-4" title="Total IPs in the range">Total Hosts</th>
             </tr>
           </thead>
-          <tbody class="text-sm sm:text-base"></tbody>
+          <tbody class="text-sm divide-y divide-gray-100"></tbody>
         </table>
       </div>
     </div>
@@ -138,17 +138,17 @@
         <span>Try it out:</span> 
         <button class="text-xs bg-indigo-50 text-indigo-600 font-semibold px-3 py-1.5 rounded-full hover:bg-indigo-100 shadow-sm transition-all duration-200" onclick="document.getElementById('firstIpInput').value='192.168.1.0'; document.getElementById('lastIpInput').value='192.168.1.255'; validateIpToCidrInputs(); calculateIpToCidr();">192.168.1.0 - 192.168.1.255</button>
       </div>
-      <div class="overflow-x-auto mt-4">
-        <table id="ipToCidrResult" class="w-full min-w-[480px] hidden border-collapse">
-          <thead>
-            <tr class="bg-gray-200 text-sm sm:text-base">
-              <th class="p-2 text-left">IP Range</th>
-              <th class="p-2 text-left">CIDR Notation</th>
-              <th class="p-2 text-left">Netmask</th>
-              <th class="p-2 text-left">Total Hosts</th>
+      <div id="ipToCidrResultWrapper" class="overflow-x-auto mt-6 rounded-xl border border-gray-200 shadow-sm hidden">
+        <table id="ipToCidrResult" class="w-full min-w-[480px] border-collapse bg-white">
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr class="text-xs font-bold text-gray-500 uppercase tracking-wider text-left">
+              <th class="px-5 py-4">IP Range</th>
+              <th class="px-5 py-4">CIDR Notation</th>
+              <th class="px-5 py-4">Netmask</th>
+              <th class="px-5 py-4">Total Hosts</th>
             </tr>
           </thead>
-          <tbody class="text-sm sm:text-base"></tbody>
+          <tbody class="text-sm divide-y divide-gray-100"></tbody>
         </table>
       </div>
     </div>
@@ -229,19 +229,19 @@
         <span>Try it out:</span> 
         <button class="text-xs bg-indigo-50 text-indigo-600 font-semibold px-3 py-1.5 rounded-full hover:bg-indigo-100 shadow-sm transition-all duration-200" onclick="document.getElementById('routeInput').value='192.168.0.0/24\n192.168.1.0/24'; validateRouteInput(); summarizeRoutes();">192.168.0.0/24 & 192.168.1.0/24</button>
       </div>
-      <div id="routeResult" class="mt-4 overflow-x-auto">
-        <table class="w-full min-w-[480px] hidden border-collapse" id="routeTable">
-          <thead>
-            <tr class="bg-gray-200 text-sm sm:text-base">
-              <th class="p-2 text-left">Original CIDRs</th>
-              <th class="p-2 text-left">Summarized CIDR</th>
-              <th class="p-2 text-left">Netmask</th>
-              <th class="p-2 text-left">Total Hosts</th>
+      <div id="routeResultWrapper" class="mt-6 overflow-x-auto rounded-xl border border-gray-200 shadow-sm hidden">
+        <table class="w-full min-w-[480px] border-collapse bg-white" id="routeTable">
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr class="text-xs font-bold text-gray-500 uppercase tracking-wider text-left">
+              <th class="px-5 py-4">Original CIDRs</th>
+              <th class="px-5 py-4">Summarized CIDR</th>
+              <th class="px-5 py-4">Netmask</th>
+              <th class="px-5 py-4">Total Hosts</th>
             </tr>
           </thead>
-          <tbody class="text-sm sm:text-base"></tbody>
+          <tbody class="text-sm divide-y divide-gray-100"></tbody>
         </table>
-        <div id="routeError" class="text-red-500 text-sm"></div>
+        <div id="routeError" class="text-red-500 text-sm px-5 py-3"></div>
       </div>
     </div>
       </main>

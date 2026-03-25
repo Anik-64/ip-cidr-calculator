@@ -184,7 +184,7 @@ function clearCidrSection() {
 function clearIpToCidrSection() {
   document.getElementById("firstIpInput").value = "";
   document.getElementById("lastIpInput").value = "";
-  document.getElementById("ipToCidrResult").classList.add("hidden");
+  document.getElementById("ipToCidrResultWrapper").classList.add("hidden");
   validateIpToCidrInputs();
 }
 
@@ -248,7 +248,7 @@ function clearOverlapSection() {
 
 function clearRouteSection() {
   document.getElementById("routeInput").value = "";
-  document.getElementById("routeTable").classList.add("hidden");
+  document.getElementById("routeResultWrapper").classList.add("hidden");
   document.getElementById("routeError").textContent = "";
   validateRouteInput();
 }
@@ -334,30 +334,30 @@ async function calculateCidrToIp() {
 
     if (data.error) {
       showError("cidrInputError", data.message);
-      document.getElementById("cidrResult").classList.add("hidden");
+      document.getElementById("cidrResultWrapper").classList.add("hidden");
       return;
     }
 
     const result = data.result;
 
+    document.getElementById("cidrResultWrapper").classList.remove("hidden");
     const table = document.getElementById("cidrResult");
-    table.classList.remove("hidden");
     const tbody = table.querySelector("tbody");
     tbody.innerHTML = `
-      <tr>
-        <td class="p-2">${result.cidrRange}</td>
-        <td class="p-2">${result.netmask}</td>
-        <td class="p-2">${result.wildcardBits}</td>
-        <td class="p-2 border-b-2 border-blue-200">${result.firstIp}</td>
-        <td class="p-2">${result.firstIpDecimal}</td>
-        <td class="p-2 border-b-2 border-blue-200">${result.lastIp}</td>
-        <td class="p-2">${result.lastIpDecimal}</td>
-        <td class="p-2">${result.totalHosts}</td>
+      <tr class="hover:bg-gray-50 transition-colors cursor-default">
+        <td class="px-5 py-4 font-medium text-gray-900">${result.cidrRange}</td>
+        <td class="px-5 py-4 text-gray-600">${result.netmask}</td>
+        <td class="px-5 py-4 text-gray-600">${result.wildcardBits}</td>
+        <td class="px-5 py-4 text-indigo-600 font-semibold">${result.firstIp}</td>
+        <td class="px-5 py-4 text-gray-500">${result.firstIpDecimal}</td>
+        <td class="px-5 py-4 text-indigo-600 font-semibold">${result.lastIp}</td>
+        <td class="px-5 py-4 text-gray-500">${result.lastIpDecimal}</td>
+        <td class="px-5 py-4 text-gray-900 font-medium">${result.totalHosts}</td>
       </tr>
     `;
   } catch (error) {
     showError("cidrInputError", "Failed to calculate. Please try again.");
-    document.getElementById("cidrResult").classList.add("hidden");
+    document.getElementById("cidrResultWrapper").classList.add("hidden");
   }
 }
 
@@ -413,26 +413,26 @@ async function calculateIpToCidr() {
 
     if (data.error) {
       showError("ipToCidrError", data.message);
-      document.getElementById("ipToCidrResult").classList.add("hidden");
+      document.getElementById("ipToCidrResultWrapper").classList.add("hidden");
       return;
     }
 
     const result = data.result;
 
+    document.getElementById("ipToCidrResultWrapper").classList.remove("hidden");
     const table = document.getElementById("ipToCidrResult");
-    table.classList.remove("hidden");
     const tbody = table.querySelector("tbody");
     tbody.innerHTML = `
-      <tr>
-        <td class="p-2">${result.ipRange}</td>
-        <td class="p-2">${result.cidrNotation}</td>
-        <td class="p-2">${result.netmask}</td>
-        <td class="p-2">${result.totalHosts}</td>
+      <tr class="hover:bg-gray-50 transition-colors cursor-default">
+        <td class="px-5 py-4 font-medium text-gray-900">${result.ipRange}</td>
+        <td class="px-5 py-4"><span class="bg-indigo-50 text-indigo-700 font-bold px-3 py-1 rounded-md border border-indigo-100 shadow-sm">${result.cidrNotation}</span></td>
+        <td class="px-5 py-4 text-gray-600">${result.netmask}</td>
+        <td class="px-5 py-4 text-gray-900 font-medium">${result.totalHosts}</td>
       </tr>
     `;
   } catch (error) {
     showError("ipToCidrError", "Failed to calculate. Please try again.");
-    document.getElementById("ipToCidrResult").classList.add("hidden");
+    document.getElementById("ipToCidrResultWrapper").classList.add("hidden");
   }
 }
 
@@ -542,41 +542,23 @@ async function calculateAwsSubnets() {
   const subnets = data.subnets;
   subnets.forEach((subnet, index) => {
     resultDiv.innerHTML += `
-      <div class="bg-gray-50 p-4 rounded-lg shadow">
-        <h3 class="text-lg font-semibold mb-2">${
-          subnet.name || `Subnet ${index + 1}`
-        }</h3>
-        <table class="w-full">
-          <tr><td class="p-2 font-bold">CIDR Range</td><td class="p-2">${
-            subnet.cidrRange
-          }</td></tr>
-          <tr><td class="p-2 font-bold">Netmask</td><td class="p-2">${
-            subnet.netmask
-          }</td></tr>
-          <tr><td class="p-2 font-bold">Wildcard Bits</td><td class="p-2">${
-            subnet.wildcardBits
-          }</td></tr>
-          <tr class="border-2 border-blue-200"><td class="p-2 font-bold">First IP</td><td class="p-2">${
-            subnet.firstIp
-          }</td></tr>
-          <tr><td class="p-2 font-bold">First IP (Dec)</td><td class="p-2">${
-            subnet.firstIpDecimal
-          }</td></tr>
-          <tr class="border-2 border-blue-200"><td class="p-2 font-bold">Last IP</td><td class="p-2">${
-            subnet.lastIp
-          }</td></tr>
-          <tr><td class="p-2 font-bold">Last IP (Dec)</td><td class="p-2">${
-            subnet.lastIpDecimal
-          }</td></tr>
-          <tr><td class="p-2 font-bold">Total Hosts</td><td class="p-2">${
-            subnet.totalHosts
-          }</td></tr>
-          <tr><td class="p-2 font-bold text-green-600">Usable Hosts</td><td class="p-2">${
-            subnet.usableHosts
-          }</td></tr>
-          <tr><td class="p-2 font-bold text-red-600">Reserved IPs</td><td class="p-2">${
-            subnet.reservedIps
-          }</td></tr>
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
+        <div class="bg-gradient-to-r from-gray-50 to-white px-5 py-3 border-b border-gray-200">
+          <h3 class="text-lg font-bold text-indigo-900">${subnet.name || `Subnet ${index + 1}`}</h3>
+        </div>
+        <table class="w-full text-sm">
+          <tbody class="divide-y divide-gray-100">
+            <tr class="hover:bg-gray-50 transition-colors"><td class="px-5 py-2.5 font-medium text-gray-600 w-1/2">CIDR Range</td><td class="px-5 py-2.5 text-gray-900 font-semibold">${subnet.cidrRange}</td></tr>
+            <tr class="hover:bg-gray-50 transition-colors"><td class="px-5 py-2.5 font-medium text-gray-600">Netmask</td><td class="px-5 py-2.5 text-gray-800">${subnet.netmask}</td></tr>
+            <tr class="hover:bg-gray-50 transition-colors"><td class="px-5 py-2.5 font-medium text-gray-600">Wildcard Bits</td><td class="px-5 py-2.5 text-gray-800">${subnet.wildcardBits}</td></tr>
+            <tr class="hover:bg-indigo-50/50 transition-colors bg-indigo-50/30"><td class="px-5 py-2.5 font-medium text-indigo-800">First IP</td><td class="px-5 py-2.5 text-indigo-900 font-bold">${subnet.firstIp}</td></tr>
+            <tr class="hover:bg-gray-50 transition-colors"><td class="px-5 py-2.5 font-medium text-gray-600">First IP (Dec)</td><td class="px-5 py-2.5 text-gray-500">${subnet.firstIpDecimal}</td></tr>
+            <tr class="hover:bg-indigo-50/50 transition-colors bg-indigo-50/30"><td class="px-5 py-2.5 font-medium text-indigo-800">Last IP</td><td class="px-5 py-2.5 text-indigo-900 font-bold">${subnet.lastIp}</td></tr>
+            <tr class="hover:bg-gray-50 transition-colors"><td class="px-5 py-2.5 font-medium text-gray-600">Last IP (Dec)</td><td class="px-5 py-2.5 text-gray-500">${subnet.lastIpDecimal}</td></tr>
+            <tr class="hover:bg-gray-50 transition-colors"><td class="px-5 py-2.5 font-medium text-gray-600">Total Hosts</td><td class="px-5 py-2.5 text-gray-900 font-semibold">${subnet.totalHosts}</td></tr>
+            <tr class="hover:bg-emerald-50 transition-colors"><td class="px-5 py-2.5 font-bold text-emerald-700">Usable Hosts</td><td class="px-5 py-2.5 text-emerald-800 font-bold">${subnet.usableHosts}</td></tr>
+            <tr class="hover:bg-red-50 transition-colors"><td class="px-5 py-2.5 font-semibold text-red-600">Reserved IPs</td><td class="px-5 py-2.5 text-red-600">${subnet.reservedIps}</td></tr>
+          </tbody>
         </table>
       </div>
     `;
@@ -673,26 +655,25 @@ async function summarizeRoutes() {
 
     if (data.error) {
       showError("routeInputError", data.message);
-      document.getElementById("routeResult").classList.add("hidden");
+      document.getElementById("routeResultWrapper").classList.add("hidden");
       return;
     }
 
     const table = document.getElementById("routeTable");
-    document.getElementById("routeResult").classList.remove("hidden");
-    table.classList.remove("hidden");
+    document.getElementById("routeResultWrapper").classList.remove("hidden");
     document.getElementById("routeInputError").textContent = "";
     const tbody = table.querySelector("tbody");
     tbody.innerHTML = `
-      <tr>
-        <td class="p-2">${data.originalCidrs.join(", ")}</td>
-        <td class="p-2">${data.summarizedCidr}</td>
-        <td class="p-2">${data.netmask}</td>
-        <td class="p-2">${data.totalHosts}</td>
+      <tr class="hover:bg-gray-50 transition-colors cursor-default">
+        <td class="px-5 py-4 text-sm text-gray-600 whitespace-pre-line leading-relaxed">${data.originalCidrs.join("\n")}</td>
+        <td class="px-5 py-4"><span class="bg-indigo-50 text-indigo-700 font-bold px-3 py-1 rounded-md border border-indigo-100 shadow-sm">${data.summarizedCidr}</span></td>
+        <td class="px-5 py-4 text-gray-600">${data.netmask}</td>
+        <td class="px-5 py-4 text-gray-900 font-medium">${data.totalHosts}</td>
       </tr>
     `;
   } catch (error) {
     showError("routeInputError", "Failed to summarize. Please try again.");
-    document.getElementById("routeResult").classList.add("hidden");
+    document.getElementById("routeResultWrapper").classList.add("hidden");
   }
 }
 
