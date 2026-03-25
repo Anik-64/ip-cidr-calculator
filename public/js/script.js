@@ -182,12 +182,14 @@ function clearAwsSection() {
   document.getElementById("awsCidrInput").value = "";
   document.getElementById("numSubnetsInput").value = "";
   document.getElementById("customSubnetInputs").innerHTML = `
-    <div class="flex gap-2 items-center">
-      <input type="number" class="subnet-hosts w-full p-2 border rounded" placeholder="Hosts for Subnet 1 (e.g., 500)" min="1" oninput="validateAwsInputs()">
-      <input type="text" class="subnet-name w-1/2 p-2 border rounded" placeholder="Name (optional)">
-      <button class="text-red-500 text-sm font-bold w-6 h-6 flex items-center justify-center border border-red-500 rounded hover:bg-red-100" onclick="this.parentElement.remove(); updatePlaceholders(); validateAwsInputs();">X</button>
+    <div class="flex gap-3 items-center">
+      <input type="number" class="subnet-hosts w-1/2 p-3 bg-white border border-gray-200 text-gray-900 rounded-lg focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 focus:outline-none transition-all duration-200 shadow-sm" placeholder="Hosts for Subnet 1 (e.g., 500)" min="1" oninput="validateAwsInputs()">
+      <input type="text" class="subnet-name w-1/2 p-3 bg-white border border-gray-200 text-gray-900 rounded-lg focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 focus:outline-none transition-all duration-200 shadow-sm" placeholder="Name (optional)">
+      <button class="text-red-500 font-bold w-10 h-10 flex items-center justify-center bg-white border border-red-200 hover:bg-red-50 hover:border-red-500 rounded-lg transition-colors shadow-sm text-lg" title="Remove" onclick="this.parentElement.remove(); updatePlaceholders(); validateAwsInputs();">&times;</button>
     </div>
-    <button id="addSubnet" class="text-blue-500 text-sm underline text-left">+ Add Another Subnet</button>
+    <button id="addSubnet" class="text-indigo-600 font-semibold text-sm flex flex-row items-center gap-1 hover:text-indigo-800 transition-colors w-fit mt-2">
+      + Add Another Subnet
+    </button>
   `;
   document.getElementById("awsSubnetsResult").innerHTML = "";
   document.getElementById("downloadSubnets").classList.add("hidden");
@@ -199,21 +201,22 @@ function clearAwsSection() {
     const subnetCount =
       subnetInputs.getElementsByClassName("subnet-hosts").length + 1;
     const inputContainer = document.createElement("div");
-    inputContainer.className = "flex gap-2 items-center";
+    inputContainer.className = "flex gap-3 items-center";
     const newInput = document.createElement("input");
     newInput.type = "number";
-    newInput.className = "subnet-hosts w-full p-2 border rounded";
+    newInput.className = "subnet-hosts w-1/2 p-3 bg-white border border-gray-200 text-gray-900 rounded-lg focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 focus:outline-none transition-all duration-200 shadow-sm";
     newInput.placeholder = `Hosts for Subnet ${subnetCount}`;
     newInput.min = "1";
     newInput.oninput = validateAwsInputs;
     const nameInput = document.createElement("input");
     nameInput.type = "text";
-    nameInput.className = "subnet-name w-1/2 p-2 border rounded";
+    nameInput.className = "subnet-name w-1/2 p-3 bg-white border border-gray-200 text-gray-900 rounded-lg focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 focus:outline-none transition-all duration-200 shadow-sm";
     nameInput.placeholder = `Name (optional)`;
     const deleteButton = document.createElement("button");
-    deleteButton.textContent = "X";
+    deleteButton.innerHTML = "&times;";
+    deleteButton.title = "Remove";
     deleteButton.className =
-      "text-red-500 text-sm font-bold w-6 h-6 flex items-center justify-center border border-red-500 rounded hover:bg-red-100";
+      "text-red-500 font-bold w-10 h-10 flex items-center justify-center bg-white border border-red-200 hover:bg-red-50 hover:border-red-500 rounded-lg transition-colors shadow-sm text-lg";
     deleteButton.onclick = () => {
       inputContainer.remove();
       updatePlaceholders();
@@ -426,24 +429,25 @@ document.getElementById("addSubnet").addEventListener("click", () => {
   const subnetCount = subnetInputs.getElementsByClassName("subnet-hosts").length + 1;
 
   const inputContainer = document.createElement("div");
-  inputContainer.className = "flex gap-2 items-center";
+  inputContainer.className = "flex gap-3 items-center";
 
   const newInput = document.createElement("input");
   newInput.type = "number";
-  newInput.className = "subnet-hosts w-1/2 p-2 border rounded";
+  newInput.className = "subnet-hosts w-1/2 p-3 bg-white border border-gray-200 text-gray-900 rounded-lg focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 focus:outline-none transition-all duration-200 shadow-sm";
   newInput.placeholder = `Hosts for Subnet ${subnetCount}`;
   newInput.min = "1";
   newInput.oninput = validateAwsInputs;
 
   const nameInput = document.createElement("input");
   nameInput.type = "text";
-  nameInput.className = "subnet-name w-1/2 p-2 border rounded";
+  nameInput.className = "subnet-name w-1/2 p-3 bg-white border border-gray-200 text-gray-900 rounded-lg focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 focus:outline-none transition-all duration-200 shadow-sm";
   nameInput.placeholder = `Name (optional)`;
 
   const deleteButton = document.createElement("button");
-  deleteButton.textContent = "X";
+  deleteButton.innerHTML = "&times;";
+  deleteButton.title = "Remove";
   deleteButton.className =
-    "text-red-500 text-sm font-bold w-6 h-6 flex items-center justify-center border border-red-500 rounded hover:bg-red-100";
+    "text-red-500 font-bold w-10 h-10 flex items-center justify-center bg-white border border-red-200 hover:bg-red-50 hover:border-red-500 rounded-lg transition-colors shadow-sm text-lg";
   deleteButton.onclick = () => {
     inputContainer.remove();
     updatePlaceholders();
