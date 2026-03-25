@@ -24,15 +24,30 @@
   <link rel="icon" type="image/png" href="./images/ip-address.png" alt="IP/CIDR Calculator Logo">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 p-4 sm:p-6">
-  <div class="max-w-5xl mx-auto">
-    <h1 class="text-2xl sm:text-3xl font-bold text-center mb-6">IP/CIDR Calculator</h1>
-    <p class="text-center text-gray-600 mb-6">
+<body class="bg-gray-100 p-4 sm:p-6 min-h-screen flex flex-col">
+  <div class="max-w-7xl mx-auto w-full flex-grow">
+    <h1 class="text-2xl sm:text-3xl font-bold text-center mb-6 mt-4">IP/CIDR Calculator</h1>
+    <p class="text-center text-gray-600 mb-8 max-w-3xl mx-auto">
       A tool for network engineers to calculate IP ranges, convert formats, manage AWS subnets, check overlaps, and summarize routes.
     </p>
 
+    <div class="flex flex-col md:flex-row gap-6">
+      <!-- Sidebar Navigation -->
+      <aside class="w-full md:w-1/4 bg-white rounded-lg shadow p-4 h-max md:sticky md:top-4">
+        <nav class="flex flex-col gap-2">
+          <button onclick="showSection('section-cidr')" id="nav-section-cidr" class="text-left px-4 py-2 rounded-md font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">CIDR to IP Range</button>
+          <button onclick="showSection('section-ip')" id="nav-section-ip" class="text-left px-4 py-2 rounded-md font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">IP to CIDR</button>
+          <button onclick="showSection('section-aws')" id="nav-section-aws" class="text-left px-4 py-2 rounded-md font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">AWS Subnet Calculator</button>
+          <button onclick="showSection('section-overlap')" id="nav-section-overlap" class="text-left px-4 py-2 rounded-md font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">Subnet Overlap</button>
+          <button onclick="showSection('section-route')" id="nav-section-route" class="text-left px-4 py-2 rounded-md font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors">Route Summarization</button>
+        </nav>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="w-full md:w-3/4">
+
     <!-- CIDR to IP Range -->
-    <div class="bg-white p-4 rounded-lg shadow mb-6">
+    <div id="section-cidr" class="calc-section bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow duration-300 mb-6">
       <h2 class="text-lg sm:text-xl font-semibold mb-4">CIDR to IP Range</h2>
       <div class="flex flex-col sm:flex-row gap-2">
         <div class="relative w-full">
@@ -67,7 +82,7 @@
     </div>
 
     <!-- IP to CIDR -->
-    <div class="bg-white p-4 rounded-lg shadow mb-6">
+    <div id="section-ip" class="calc-section hidden bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow duration-300 mb-6">
       <h2 class="text-lg sm:text-xl font-semibold mb-4">IP to CIDR</h2>
       <div class="flex flex-col gap-2">
         <input id="firstIpInput" type="text" placeholder="First IP (192.168.1.0)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500" oninput="validateIpToCidrInputs()">
@@ -97,7 +112,7 @@
     </div>
 
     <!-- AWS Subnet Calculator -->
-    <section class="bg-white p-4 rounded-lg shadow mb-6" aria-labelledby="aws-subnet-heading">
+    <section id="section-aws" class="calc-section hidden bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow duration-300 mb-6" aria-labelledby="aws-subnet-heading">
       <h2 id="aws-subnet-heading" class="text-lg sm:text-xl font-semibold mb-4">AWS Subnet Calculator</h2>
       <p class="text-sm text-gray-600 mb-4">Generate AWS subnets from a CIDR block, either equally divided or with custom host counts.</p>
       <div class="flex flex-col gap-2">
@@ -135,7 +150,7 @@
     </section>
 
     <!-- Subnet Overlap Checker -->
-    <div class="bg-white p-4 rounded-lg shadow mb-6">
+    <div id="section-overlap" class="calc-section hidden bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow duration-300 mb-6">
       <h2 class="text-lg sm:text-xl font-semibold mb-4">Subnet Overlap Checker</h2>
       <textarea id="overlapInput" placeholder="Enter CIDRs, one per line (192.168.1.0/24)" class="w-full p-2 border rounded mb-2 h-24" oninput="validateOverlapInput()"></textarea>
       <div id="overlapError" class="text-xs text-red-500 mt-1 mb-1 hidden"></div>
@@ -150,7 +165,7 @@
     </div>
 
     <!-- Route Summarization -->
-    <div class="bg-white p-4 rounded-lg shadow mb-6">
+    <div id="section-route" class="calc-section hidden bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow duration-300 mb-6">
       <h2 class="text-lg sm:text-xl font-semibold mb-4">Route Summarization</h2>
       <textarea id="routeInput" placeholder="Enter CIDRs, one per line (192.168.0.0/24)" class="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 h-24" oninput="validateRouteInput()"></textarea>
       <div id="routeInputError" class="text-xs text-red-500 mt-1 hidden"></div>
@@ -176,8 +191,10 @@
         <div id="routeError" class="text-red-500 text-sm"></div>
       </div>
     </div>
+      </main>
+    </div>
   </div>
-  <footer class="text-center text-gray-500 text-sm mt-6">
+  <footer class="text-center text-gray-500 text-sm mt-auto py-6">
     <p>IP/CIDR Calculator v1.0 | Built by Anik Majumder | © 2025</p>
   </footer>
   <script src="/js/script.js"></script>

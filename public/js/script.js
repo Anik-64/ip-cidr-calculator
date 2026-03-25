@@ -679,3 +679,34 @@ async function summarizeRoutes() {
     document.getElementById("routeResult").classList.add("hidden");
   }
 }
+
+// Sidebar Navigation Logic
+function showSection(sectionId) {
+  // Hide all sections
+  document.querySelectorAll('.calc-section').forEach((section) => {
+    section.classList.add('hidden');
+  });
+  
+  // Show target section
+  const target = document.getElementById(sectionId);
+  if (target) {
+    target.classList.remove('hidden');
+  }
+  
+  // Update nav active state
+  document.querySelectorAll('aside nav button').forEach((btn) => {
+    btn.classList.remove('bg-blue-50', 'text-blue-700');
+    btn.classList.add('text-gray-600', 'hover:bg-gray-100', 'hover:text-gray-900');
+  });
+  
+  const activeBtn = document.getElementById('nav-' + sectionId);
+  if (activeBtn) {
+    activeBtn.classList.remove('text-gray-600', 'hover:bg-gray-100', 'hover:text-gray-900');
+    activeBtn.classList.add('bg-blue-50', 'text-blue-700');
+  }
+}
+
+// Ensure the first section is active on load
+document.addEventListener('DOMContentLoaded', () => {
+  showSection('section-cidr');
+});
