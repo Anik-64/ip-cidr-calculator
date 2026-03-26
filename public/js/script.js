@@ -344,15 +344,15 @@ async function calculateCidrToIp() {
     const table = document.getElementById("cidrResult");
     const tbody = table.querySelector("tbody");
     tbody.innerHTML = `
-      <tr class="hover:bg-gray-50 transition-colors cursor-default">
-        <td class="px-5 py-4 font-medium text-gray-900">${result.cidrRange}</td>
-        <td class="px-5 py-4 text-gray-600">${result.netmask}</td>
-        <td class="px-5 py-4 text-gray-600">${result.wildcardBits}</td>
-        <td class="px-5 py-4 text-indigo-600 font-semibold">${result.firstIp}</td>
-        <td class="px-5 py-4 text-gray-500">${result.firstIpDecimal}</td>
-        <td class="px-5 py-4 text-indigo-600 font-semibold">${result.lastIp}</td>
-        <td class="px-5 py-4 text-gray-500">${result.lastIpDecimal}</td>
-        <td class="px-5 py-4 text-gray-900 font-medium">${result.totalHosts}</td>
+      <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors cursor-default">
+        <td class="px-5 py-4 font-medium text-gray-900 dark:text-slate-100">${result.cidrRange}</td>
+        <td class="px-5 py-4 text-gray-600 dark:text-slate-400">${result.netmask}</td>
+        <td class="px-5 py-4 text-gray-600 dark:text-slate-400">${result.wildcardBits}</td>
+        <td class="px-5 py-4 text-indigo-600 dark:text-indigo-400 font-semibold">${result.firstIp}</td>
+        <td class="px-5 py-4 text-gray-500 dark:text-slate-500">${result.firstIpDecimal}</td>
+        <td class="px-5 py-4 text-indigo-600 dark:text-indigo-400 font-semibold">${result.lastIp}</td>
+        <td class="px-5 py-4 text-gray-500 dark:text-slate-500">${result.lastIpDecimal}</td>
+        <td class="px-5 py-4 text-gray-900 dark:text-slate-100 font-medium">${result.totalHosts}</td>
       </tr>
     `;
   } catch (error) {
@@ -423,11 +423,11 @@ async function calculateIpToCidr() {
     const table = document.getElementById("ipToCidrResult");
     const tbody = table.querySelector("tbody");
     tbody.innerHTML = `
-      <tr class="hover:bg-gray-50 transition-colors cursor-default">
-        <td class="px-5 py-4 font-medium text-gray-900">${result.ipRange}</td>
-        <td class="px-5 py-4"><span class="bg-indigo-50 text-indigo-700 font-bold px-3 py-1 rounded-md border border-indigo-100 shadow-sm">${result.cidrNotation}</span></td>
-        <td class="px-5 py-4 text-gray-600">${result.netmask}</td>
-        <td class="px-5 py-4 text-gray-900 font-medium">${result.totalHosts}</td>
+      <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors cursor-default">
+        <td class="px-5 py-4 font-medium text-gray-900 dark:text-slate-100">${result.ipRange}</td>
+        <td class="px-5 py-4"><span class="bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 font-bold px-3 py-1 rounded-md border border-indigo-100 dark:border-indigo-800 shadow-sm">${result.cidrNotation}</span></td>
+        <td class="px-5 py-4 text-gray-600 dark:text-slate-400">${result.netmask}</td>
+        <td class="px-5 py-4 text-gray-900 dark:text-slate-100 font-medium">${result.totalHosts}</td>
       </tr>
     `;
   } catch (error) {
@@ -445,21 +445,21 @@ document.getElementById("addSubnet").addEventListener("click", () => {
 
   const newInput = document.createElement("input");
   newInput.type = "number";
-  newInput.className = "subnet-hosts w-1/2 p-3 bg-white border border-gray-200 text-gray-900 rounded-lg focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 focus:outline-none transition-all duration-200 shadow-sm";
+  newInput.className = "subnet-hosts w-1/2 p-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-slate-100 rounded-lg focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 focus:border-indigo-500 dark:focus:border-indigo-400 focus:outline-none transition-all duration-200 shadow-sm";
   newInput.placeholder = `Hosts for Subnet ${subnetCount}`;
   newInput.min = "1";
   newInput.oninput = validateAwsInputs;
 
   const nameInput = document.createElement("input");
   nameInput.type = "text";
-  nameInput.className = "subnet-name w-1/2 p-3 bg-white border border-gray-200 text-gray-900 rounded-lg focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 focus:outline-none transition-all duration-200 shadow-sm";
+  nameInput.className = "subnet-name w-1/2 p-3 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-slate-100 rounded-lg focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900/30 focus:border-indigo-500 dark:focus:border-indigo-400 focus:outline-none transition-all duration-200 shadow-sm";
   nameInput.placeholder = `Name (optional)`;
 
   const deleteButton = document.createElement("button");
   deleteButton.innerHTML = "&times;";
   deleteButton.title = "Remove";
   deleteButton.className =
-    "text-red-500 font-bold w-10 h-10 flex items-center justify-center bg-white border border-red-200 hover:bg-red-50 hover:border-red-500 rounded-lg transition-colors shadow-sm text-lg";
+    "text-red-500 dark:text-red-400 font-bold w-10 h-10 flex items-center justify-center bg-white dark:bg-slate-800 border border-red-200 dark:border-red-900/30 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-500 dark:hover:border-red-400 rounded-lg transition-colors shadow-sm text-lg";
   deleteButton.onclick = () => {
     inputContainer.remove();
     updatePlaceholders();
@@ -542,22 +542,22 @@ async function calculateAwsSubnets() {
   const subnets = data.subnets;
   subnets.forEach((subnet, index) => {
     resultDiv.innerHTML += `
-      <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
-        <div class="bg-gradient-to-r from-gray-50 to-white px-5 py-3 border-b border-gray-200">
-          <h3 class="text-lg font-bold text-indigo-900">${subnet.name || `Subnet ${index + 1}`}</h3>
+      <div class="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
+        <div class="bg-gradient-to-r from-gray-50 to-white dark:from-slate-900/50 dark:to-slate-800 px-5 py-3 border-b border-gray-200 dark:border-slate-700">
+          <h3 class="text-lg font-bold text-indigo-900 dark:text-indigo-300">${subnet.name || `Subnet ${index + 1}`}</h3>
         </div>
         <table class="w-full text-sm">
-          <tbody class="divide-y divide-gray-100">
-            <tr class="hover:bg-gray-50 transition-colors"><td class="px-5 py-2.5 font-medium text-gray-600 w-1/2">CIDR Range</td><td class="px-5 py-2.5 text-gray-900 font-semibold">${subnet.cidrRange}</td></tr>
-            <tr class="hover:bg-gray-50 transition-colors"><td class="px-5 py-2.5 font-medium text-gray-600">Netmask</td><td class="px-5 py-2.5 text-gray-800">${subnet.netmask}</td></tr>
-            <tr class="hover:bg-gray-50 transition-colors"><td class="px-5 py-2.5 font-medium text-gray-600">Wildcard Bits</td><td class="px-5 py-2.5 text-gray-800">${subnet.wildcardBits}</td></tr>
-            <tr class="hover:bg-indigo-50/50 transition-colors bg-indigo-50/30"><td class="px-5 py-2.5 font-medium text-indigo-800">First IP</td><td class="px-5 py-2.5 text-indigo-900 font-bold">${subnet.firstIp}</td></tr>
-            <tr class="hover:bg-gray-50 transition-colors"><td class="px-5 py-2.5 font-medium text-gray-600">First IP (Dec)</td><td class="px-5 py-2.5 text-gray-500">${subnet.firstIpDecimal}</td></tr>
-            <tr class="hover:bg-indigo-50/50 transition-colors bg-indigo-50/30"><td class="px-5 py-2.5 font-medium text-indigo-800">Last IP</td><td class="px-5 py-2.5 text-indigo-900 font-bold">${subnet.lastIp}</td></tr>
-            <tr class="hover:bg-gray-50 transition-colors"><td class="px-5 py-2.5 font-medium text-gray-600">Last IP (Dec)</td><td class="px-5 py-2.5 text-gray-500">${subnet.lastIpDecimal}</td></tr>
-            <tr class="hover:bg-gray-50 transition-colors"><td class="px-5 py-2.5 font-medium text-gray-600">Total Hosts</td><td class="px-5 py-2.5 text-gray-900 font-semibold">${subnet.totalHosts}</td></tr>
-            <tr class="hover:bg-emerald-50 transition-colors"><td class="px-5 py-2.5 font-bold text-emerald-700">Usable Hosts</td><td class="px-5 py-2.5 text-emerald-800 font-bold">${subnet.usableHosts}</td></tr>
-            <tr class="hover:bg-red-50 transition-colors"><td class="px-5 py-2.5 font-semibold text-red-600">Reserved IPs</td><td class="px-5 py-2.5 text-red-600">${subnet.reservedIps}</td></tr>
+          <tbody class="divide-y divide-gray-100 dark:divide-slate-700">
+            <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors"><td class="px-5 py-2.5 font-medium text-gray-600 dark:text-slate-400 w-1/2">CIDR Range</td><td class="px-5 py-2.5 text-gray-900 dark:text-slate-100 font-semibold">${subnet.cidrRange}</td></tr>
+            <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors"><td class="px-5 py-2.5 font-medium text-gray-600 dark:text-slate-400">Netmask</td><td class="px-5 py-2.5 text-gray-800 dark:text-slate-200">${subnet.netmask}</td></tr>
+            <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors"><td class="px-5 py-2.5 font-medium text-gray-600 dark:text-slate-400">Wildcard Bits</td><td class="px-5 py-2.5 text-gray-800 dark:text-slate-200">${subnet.wildcardBits}</td></tr>
+            <tr class="hover:bg-indigo-50/50 dark:hover:bg-indigo-900/30 transition-colors bg-indigo-50/30 dark:bg-indigo-900/20"><td class="px-5 py-2.5 font-medium text-indigo-800 dark:text-indigo-300">First IP</td><td class="px-5 py-2.5 text-indigo-900 dark:text-indigo-100 font-bold">${subnet.firstIp}</td></tr>
+            <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors"><td class="px-5 py-2.5 font-medium text-gray-600 dark:text-slate-400">First IP (Dec)</td><td class="px-5 py-2.5 text-gray-500 dark:text-slate-500">${subnet.firstIpDecimal}</td></tr>
+            <tr class="hover:bg-indigo-50/50 dark:hover:bg-indigo-900/30 transition-colors bg-indigo-50/30 dark:bg-indigo-900/20"><td class="px-5 py-2.5 font-medium text-indigo-800 dark:text-indigo-300">Last IP</td><td class="px-5 py-2.5 text-indigo-900 dark:text-indigo-100 font-bold">${subnet.lastIp}</td></tr>
+            <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors"><td class="px-5 py-2.5 font-medium text-gray-600 dark:text-slate-400">Last IP (Dec)</td><td class="px-5 py-2.5 text-gray-500 dark:text-slate-500">${subnet.lastIpDecimal}</td></tr>
+            <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors"><td class="px-5 py-2.5 font-medium text-gray-600 dark:text-slate-400">Total Hosts</td><td class="px-5 py-2.5 text-gray-900 dark:text-slate-100 font-semibold">${subnet.totalHosts}</td></tr>
+            <tr class="hover:bg-emerald-50 dark:hover:bg-emerald-900/30 transition-colors"><td class="px-5 py-2.5 font-bold text-emerald-700 dark:text-emerald-400">Usable Hosts</td><td class="px-5 py-2.5 text-emerald-800 dark:text-emerald-300 font-bold">${subnet.usableHosts}</td></tr>
+            <tr class="hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"><td class="px-5 py-2.5 font-semibold text-red-600 dark:text-red-400">Reserved IPs</td><td class="px-5 py-2.5 text-red-600 dark:text-red-400">${subnet.reservedIps}</td></tr>
           </tbody>
         </table>
       </div>
@@ -664,11 +664,11 @@ async function summarizeRoutes() {
     document.getElementById("routeInputError").textContent = "";
     const tbody = table.querySelector("tbody");
     tbody.innerHTML = `
-      <tr class="hover:bg-gray-50 transition-colors cursor-default">
-        <td class="px-5 py-4 text-sm text-gray-600 whitespace-pre-line leading-relaxed">${data.originalCidrs.join("\n")}</td>
-        <td class="px-5 py-4"><span class="bg-indigo-50 text-indigo-700 font-bold px-3 py-1 rounded-md border border-indigo-100 shadow-sm">${data.summarizedCidr}</span></td>
-        <td class="px-5 py-4 text-gray-600">${data.netmask}</td>
-        <td class="px-5 py-4 text-gray-900 font-medium">${data.totalHosts}</td>
+      <tr class="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors cursor-default">
+        <td class="px-5 py-4 text-sm text-gray-600 dark:text-slate-400 whitespace-pre-line leading-relaxed">${data.originalCidrs.join("\n")}</td>
+        <td class="px-5 py-4"><span class="bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 font-bold px-3 py-1 rounded-md border border-indigo-100 dark:border-indigo-800 shadow-sm">${data.summarizedCidr}</span></td>
+        <td class="px-5 py-4 text-gray-600 dark:text-slate-400">${data.netmask}</td>
+        <td class="px-5 py-4 text-gray-900 dark:text-slate-100 font-medium">${data.totalHosts}</td>
       </tr>
     `;
   } catch (error) {
@@ -693,17 +693,63 @@ function showSection(sectionId) {
   // Update nav active state
   document.querySelectorAll('aside nav button').forEach((btn) => {
     btn.classList.remove('bg-blue-50', 'text-blue-700');
-    btn.classList.add('text-gray-600', 'hover:bg-gray-100', 'hover:text-gray-900');
+    btn.classList.add('text-gray-600', 'dark:text-slate-400', 'hover:bg-gray-100', 'dark:hover:bg-slate-700', 'hover:text-gray-900', 'dark:hover:text-slate-100');
   });
   
   const activeBtn = document.getElementById('nav-' + sectionId);
   if (activeBtn) {
-    activeBtn.classList.remove('text-gray-600', 'hover:bg-gray-100', 'hover:text-gray-900');
-    activeBtn.classList.add('bg-blue-50', 'text-blue-700');
+    activeBtn.classList.remove('text-gray-600', 'dark:text-slate-400', 'hover:bg-gray-100', 'dark:hover:bg-slate-700', 'hover:text-gray-900', 'dark:hover:text-slate-100');
+    activeBtn.classList.add('bg-blue-50', 'dark:bg-blue-900/40', 'text-blue-700', 'dark:text-blue-300');
   }
 }
 
-// Ensure the first section is active on load
+// Dark Mode Toggle Logic
+const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+const themeToggleBtn = document.getElementById('theme-toggle');
+
+function initTheme() {
+    // Change the icons inside the button based on previous settings
+    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        if (themeToggleLightIcon) themeToggleLightIcon.classList.remove('hidden');
+        document.documentElement.classList.add('dark');
+    } else {
+        if (themeToggleDarkIcon) themeToggleDarkIcon.classList.remove('hidden');
+        document.documentElement.classList.remove('dark');
+    }
+}
+
+if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', function() {
+        // toggle icons inside button
+        if (themeToggleDarkIcon) themeToggleDarkIcon.classList.toggle('hidden');
+        if (themeToggleLightIcon) themeToggleLightIcon.classList.toggle('hidden');
+
+        // if set via local storage previously
+        if (localStorage.getItem('color-theme')) {
+            if (localStorage.getItem('color-theme') === 'light') {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('color-theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('color-theme', 'light');
+            }
+
+        // if NOT set via local storage previously
+        } else {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('color-theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('color-theme', 'dark');
+            }
+        }
+    });
+}
+
+// Ensure the first section is active on load and theme is initialized
 document.addEventListener('DOMContentLoaded', () => {
   showSection('section-cidr');
+  initTheme();
 });
